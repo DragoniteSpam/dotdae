@@ -20,3 +20,11 @@ if not instance_exists(objDerpXmlRead) {
         lastNonCommentType = DerpXmlType_StartOfFile
     }
 }
+
+#macro DerpXmlType_StartOfFile   "\"StartOfFile\""
+#macro DerpXmlType_OpenTag       "\"OpenTag\""
+#macro DerpXmlType_CloseTag      "\"CloseTag\""
+#macro DerpXmlType_Text          "\"Text\""
+#macro DerpXmlType_Whitespace    "\"Whitespace\""
+#macro DerpXmlType_EndOfFile     "\"EndOfFile\""
+#macro DerpXmlType_Comment       "\"Comment\""

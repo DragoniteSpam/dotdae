@@ -103,14 +103,6 @@
             }
         },
         {
-            "Key": "37281ec0-6606-489a-a486-8251d66b6fd6",
-            "Value": {
-                "id": "8e9637ed-06fe-4f19-bf56-c7da7c8c13b7",
-                "resourcePath": "extensions\\DerpXml\\DerpXml.yy",
-                "resourceType": "GMExtension"
-            }
-        },
-        {
             "Key": "3942a02d-6174-4f8a-9348-7d62acab1da1",
             "Value": {
                 "id": "aa903dc2-36e2-405c-9b70-809ee9aefd9a",
