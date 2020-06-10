@@ -47,27 +47,11 @@
             }
         },
         {
-            "Key": "0943f994-bb21-4f98-b22c-950415194351",
-            "Value": {
-                "id": "4c41397b-e307-47b7-bfee-6b481e260119",
-                "resourcePath": "scripts\\DerpXmlWrite_New\\DerpXmlWrite_New.yy",
-                "resourceType": "GMScript"
-            }
-        },
-        {
             "Key": "1296a053-f36d-4daa-b447-4997209d0483",
             "Value": {
                 "id": "6d66e752-cbcd-4c10-bb6f-a0a948a201d5",
                 "resourcePath": "views\\1296a053-f36d-4daa-b447-4997209d0483.yy",
                 "resourceType": "GMFolder"
-            }
-        },
-        {
-            "Key": "1b9069f4-a275-49fa-beb5-79fcdcf8bb68",
-            "Value": {
-                "id": "5b9b2763-364d-4ee1-ad9e-08131ad74a62",
-                "resourcePath": "scripts\\DerpXmlWrite_Comment\\DerpXmlWrite_Comment.yy",
-                "resourceType": "GMScript"
             }
         },
         {
@@ -83,14 +67,6 @@
             "Value": {
                 "id": "72f12b61-038a-45c8-8f90-f2037930a0e8",
                 "resourcePath": "scripts\\DerpXmlRead_Read\\DerpXmlRead_Read.yy",
-                "resourceType": "GMScript"
-            }
-        },
-        {
-            "Key": "2ab53600-4cd7-4910-9848-c6d6a0f0b53e",
-            "Value": {
-                "id": "e2c93adb-68cc-4e7f-845d-e5c04d26597c",
-                "resourcePath": "scripts\\DerpXmlWrite_OpenTag\\DerpXmlWrite_OpenTag.yy",
                 "resourceType": "GMScript"
             }
         },
@@ -115,14 +91,6 @@
             "Value": {
                 "id": "17238ee5-771a-4da6-9a59-3feb268824b7",
                 "resourcePath": "views\\31067c52-bf63-4674-8239-59566a28a160.yy",
-                "resourceType": "GMFolder"
-            }
-        },
-        {
-            "Key": "32bab7be-e94e-494e-a1f2-82c3c0f950d1",
-            "Value": {
-                "id": "9b9b5227-5d6e-4770-8f7c-890ff4acb690",
-                "resourcePath": "views\\32bab7be-e94e-494e-a1f2-82c3c0f950d1.yy",
                 "resourceType": "GMFolder"
             }
         },
@@ -175,30 +143,6 @@
             }
         },
         {
-            "Key": "460cde00-e120-4499-bcc4-06576d42c61b",
-            "Value": {
-                "id": "063215c6-edb5-4326-a80c-a6fa063c61d7",
-                "resourcePath": "notes\\notes.yy",
-                "resourceType": "GMNotes"
-            }
-        },
-        {
-            "Key": "477ce12f-fec9-4cb7-9777-306639e24ce1",
-            "Value": {
-                "id": "710f93a8-a79c-4beb-b466-fc12a6fbd8e7",
-                "resourcePath": "scripts\\DerpXmlWrite_GetString\\DerpXmlWrite_GetString.yy",
-                "resourceType": "GMScript"
-            }
-        },
-        {
-            "Key": "4c291417-fd30-4cec-b77c-5a6f41052de9",
-            "Value": {
-                "id": "3b6cc32f-67d4-47ce-8923-622c2b54e438",
-                "resourcePath": "scripts\\@__global_object_depths\\__global_object_depths.yy",
-                "resourceType": "GMScript"
-            }
-        },
-        {
             "Key": "4c6c8d39-430e-4f5a-8f36-35ef7700d21c",
             "Value": {
                 "id": "d34ad397-30d2-475d-ab10-b5ba1e98696e",
@@ -231,27 +175,11 @@
             }
         },
         {
-            "Key": "55f7641c-6300-46f9-8be1-e4cb84944137",
-            "Value": {
-                "id": "ac2b84e5-1395-410f-ac2f-0e6435129c1c",
-                "resourcePath": "scripts\\DerpXmlWrite_Text\\DerpXmlWrite_Text.yy",
-                "resourceType": "GMScript"
-            }
-        },
-        {
             "Key": "5b114632-ea8f-453c-b042-21e818196f20",
             "Value": {
                 "id": "341e66cc-274a-4b39-8502-826e3068ea46",
                 "resourcePath": "scripts\\DerpXml_ThrowError\\DerpXml_ThrowError.yy",
                 "resourceType": "GMScript"
-            }
-        },
-        {
-            "Key": "5c0c3013-0ee0-4bfa-bc69-623e03e54495",
-            "Value": {
-                "id": "22315132-7c49-42bf-9b2d-03498c5b3820",
-                "resourcePath": "views\\5c0c3013-0ee0-4bfa-bc69-623e03e54495.yy",
-                "resourceType": "GMFolder"
             }
         },
         {
@@ -287,14 +215,6 @@
             }
         },
         {
-            "Key": "6e0a8ec9-adb0-4bf1-bce3-74df486430f6",
-            "Value": {
-                "id": "36378442-9c96-425f-89c9-b3af4ae805d3",
-                "resourcePath": "scripts\\@object_get_depth\\object_get_depth.yy",
-                "resourceType": "GMScript"
-            }
-        },
-        {
             "Key": "706bcb3e-b89e-49e1-8b07-487b77135c97",
             "Value": {
                 "id": "734bece5-f47b-4a28-8704-a15cc7c7daf6",
@@ -308,14 +228,6 @@
                 "id": "e655a991-bf8a-4fdc-a1ca-fa913e88b5ae",
                 "resourcePath": "scripts\\DerpXmlRead_CurValue\\DerpXmlRead_CurValue.yy",
                 "resourceType": "GMScript"
-            }
-        },
-        {
-            "Key": "74d7ce9f-3cb2-47d0-b66d-805c6fb213bc",
-            "Value": {
-                "id": "e9392921-c160-40a7-852a-3bcd0d7335e6",
-                "resourcePath": "views\\74d7ce9f-3cb2-47d0-b66d-805c6fb213bc.yy",
-                "resourceType": "GMFolder"
             }
         },
         {
@@ -351,27 +263,11 @@
             }
         },
         {
-            "Key": "7d3ae1e9-a6ce-49c9-919f-fd980c363b4c",
-            "Value": {
-                "id": "e58b6d19-e77a-4719-a6d4-76d165e5a95f",
-                "resourcePath": "scripts\\DerpXmlWrite_Config\\DerpXmlWrite_Config.yy",
-                "resourceType": "GMScript"
-            }
-        },
-        {
             "Key": "7e093a2a-e51c-4a1e-9a53-f9080d38730b",
             "Value": {
                 "id": "6d1651fa-11ee-4af5-9af4-b8ef2bfbfb3a",
                 "resourcePath": "options\\windowsuap\\options_windowsuap.yy",
                 "resourceType": "GMWindowsUAPOptions"
-            }
-        },
-        {
-            "Key": "80551509-fbe9-4a03-80d4-e87875e31e02",
-            "Value": {
-                "id": "7f6dffef-97a6-47be-b138-6148690d3617",
-                "resourcePath": "scripts\\DerpXmlExample_Write\\DerpXmlExample_Write.yy",
-                "resourceType": "GMScript"
             }
         },
         {
@@ -388,30 +284,6 @@
                 "id": "b5b6405b-998c-4897-91bc-a9da3b9ee331",
                 "resourcePath": "rooms\\room0\\room0.yy",
                 "resourceType": "GMRoom"
-            }
-        },
-        {
-            "Key": "847d8b2e-6543-45e4-9d44-95f42e8f8730",
-            "Value": {
-                "id": "e7d1b5d4-23b7-4cc6-8c32-94328bbf1a86",
-                "resourcePath": "views\\847d8b2e-6543-45e4-9d44-95f42e8f8730.yy",
-                "resourceType": "GMFolder"
-            }
-        },
-        {
-            "Key": "877db519-882b-4c51-826a-5e13e91face3",
-            "Value": {
-                "id": "5cadbdd2-df50-45c2-b5a8-e2254ea78bfe",
-                "resourcePath": "scripts\\@instance_create\\instance_create.yy",
-                "resourceType": "GMScript"
-            }
-        },
-        {
-            "Key": "90abc6d5-0d3c-4a82-9923-aa90ec2c41f2",
-            "Value": {
-                "id": "3515f2ee-aef0-49fd-a8ea-909550070402",
-                "resourcePath": "scripts\\DerpXmlWrite_CloseTag\\DerpXmlWrite_CloseTag.yy",
-                "resourceType": "GMScript"
             }
         },
         {
@@ -471,27 +343,11 @@
             }
         },
         {
-            "Key": "c182f6d1-e4b6-4ac1-9da9-5d3d6ab57089",
-            "Value": {
-                "id": "96d692de-079a-4d1f-861b-a54e6ef9e8af",
-                "resourcePath": "scripts\\DerpXmlWrite_UnloadString\\DerpXmlWrite_UnloadString.yy",
-                "resourceType": "GMScript"
-            }
-        },
-        {
             "Key": "c32047a7-1842-4879-b46c-a81a6880d3eb",
             "Value": {
                 "id": "c08eca19-c2d7-4f0e-b7c6-8f0f6f36a674",
                 "resourcePath": "views\\c32047a7-1842-4879-b46c-a81a6880d3eb.yy",
                 "resourceType": "GMFolder"
-            }
-        },
-        {
-            "Key": "cbe801ec-b6a2-4036-a144-ba9a9b79ef1f",
-            "Value": {
-                "id": "f0c08c60-2c09-4ba3-b003-184561dafcd9",
-                "resourcePath": "scripts\\DerpXmlWrite_LeafElement\\DerpXmlWrite_LeafElement.yy",
-                "resourceType": "GMScript"
             }
         },
         {
@@ -532,14 +388,6 @@
                 "id": "5b8478d6-823b-4d0e-a0a4-446d49f3b1bf",
                 "resourcePath": "views\\d51847b0-bf74-4286-a5a4-ea880328ff6e.yy",
                 "resourceType": "GMFolder"
-            }
-        },
-        {
-            "Key": "dfdd950c-a7d9-4241-9033-2d59f168baf0",
-            "Value": {
-                "id": "f63053c9-2250-4a59-9b39-a3a6d802bd79",
-                "resourcePath": "scripts\\DerpXmlWrite_Attribute\\DerpXmlWrite_Attribute.yy",
-                "resourceType": "GMScript"
             }
         },
         {
@@ -589,14 +437,6 @@
                 "resourcePath": "options\\xboxone\\options_xboxone.yy",
                 "resourceType": "GMXBoxOneOptions"
             }
-        },
-        {
-            "Key": "f9dae882-4085-45b0-a49a-75c34f8cf1ae",
-            "Value": {
-                "id": "8f410bf0-2002-47a5-b7e8-360cf4a9c26b",
-                "resourcePath": "notes\\compatibility_report_100620_2324502450.yy",
-                "resourceType": "GMNotes"
-            }
         }
     ],
     "script_order": [
@@ -610,24 +450,10 @@
         "70a6b126-1937-4258-93b7-39550a1a6fe4",
         "f70a4fb9-1fd2-4347-81c5-d509759bda39",
         "2bb2a42b-fe67-4188-8e85-302ba34b1163",
-        "0943f994-bb21-4f98-b22c-950415194351",
-        "7d3ae1e9-a6ce-49c9-919f-fd980c363b4c",
-        "477ce12f-fec9-4cb7-9777-306639e24ce1",
-        "c182f6d1-e4b6-4ac1-9da9-5d3d6ab57089",
-        "2ab53600-4cd7-4910-9848-c6d6a0f0b53e",
-        "90abc6d5-0d3c-4a82-9923-aa90ec2c41f2",
-        "55f7641c-6300-46f9-8be1-e4cb84944137",
-        "dfdd950c-a7d9-4241-9033-2d59f168baf0",
-        "cbe801ec-b6a2-4036-a144-ba9a9b79ef1f",
-        "1b9069f4-a275-49fa-beb5-79fcdcf8bb68",
         "784318cf-7baa-4172-bf6a-303853ea68e6",
         "7d280d3f-5f47-4f06-abb5-cabd90fe7f77",
         "3942a02d-6174-4f8a-9348-7d62acab1da1",
-        "80551509-fbe9-4a03-80d4-e87875e31e02",
-        "5b114632-ea8f-453c-b042-21e818196f20",
-        "877db519-882b-4c51-826a-5e13e91face3",
-        "6e0a8ec9-adb0-4bf1-bce3-74df486430f6",
-        "4c291417-fd30-4cec-b77c-5a6f41052de9"
+        "5b114632-ea8f-453c-b042-21e818196f20"
     ],
     "tutorial": ""
 }
