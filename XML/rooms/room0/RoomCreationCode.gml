@@ -1,0 +1,8 @@
+show_debug_message("")
+DerpXmlExample_Read()
+show_debug_message("")
+DerpXmlExample_ReadOther()
+show_debug_message("")
+DerpXmlExample_ReadComplex()
+show_debug_message("")
+DerpXmlExample_Write()
