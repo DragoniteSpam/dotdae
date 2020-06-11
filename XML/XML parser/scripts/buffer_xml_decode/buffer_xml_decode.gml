@@ -9,9 +9,6 @@ var _buffer = argument0;
 var _offset = argument1;
 var _size   = argument2;
 
-var _buffer_copy = buffer_create(buffer_get_size(_buffer), buffer_fixed, 1);
-buffer_copy(_buffer, 0, buffer_get_size(_buffer), _buffer_copy, 0);
-
 var _old_tell = buffer_tell(_buffer);
 buffer_seek(_buffer, buffer_seek_start, _offset);
 
