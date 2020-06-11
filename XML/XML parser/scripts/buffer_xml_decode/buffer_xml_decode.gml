@@ -1,4 +1,5 @@
 /// Decodes an XML string stored in a buffer and outputs a JSON equivalent
+/// This is definitely probably not 100% compliant, but it's good enough for what I need
 ///
 /// @param buffer
 /// @param offset
