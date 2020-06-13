@@ -1,5 +1,5 @@
 {
-    "id": "dac43ff9-6b71-4680-beeb-30e8c1c2f1ff",
+    "id": "9da9ce11-c07c-4aef-aadf-5e14627d9ad3",
     "modelName": "GMIncludedFile",
     "mvc": "1.0",
     "name": "sponza.dae",

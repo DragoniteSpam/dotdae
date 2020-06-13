@@ -1,3 +1,5 @@
+global.dae_image_library = ds_map_create();
+
 #region Internal macros
 
 //Always date your work!

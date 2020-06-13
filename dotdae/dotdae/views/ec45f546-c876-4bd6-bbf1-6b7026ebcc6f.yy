@@ -17,7 +17,8 @@
         "34c871fa-a14f-4683-a099-1cf635d36e3f",
         "cb957fc6-0e70-4b22-af73-d73a581ac140",
         "3de87189-979f-4cce-a3b2-96e2fe18249f",
-        "e39ee9fa-d3e2-436e-8eb7-fcacba821108"
+        "e39ee9fa-d3e2-436e-8eb7-fcacba821108",
+        "32e19507-56cd-4b96-ac32-489c4194157e"
     ],
     "filterType": "GMScript",
     "folderName": "dotdae",
