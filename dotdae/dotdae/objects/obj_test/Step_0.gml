@@ -49,9 +49,9 @@ cam_dz =  _cos_pitch*dcos(cam_yaw);
 //Move parallel/perpendicular to the camera
 var _para = keyboard_check(ord("W")) - keyboard_check(ord("S"));
 var _perp = keyboard_check(ord("A")) - keyboard_check(ord("D"));
-cam_x += 5*(cam_dx*_para - cam_dz*_perp);
-cam_y += 5*(keyboard_check(vk_space) - keyboard_check(vk_shift));
-cam_z += 5*(cam_dz*_para + cam_dx*_perp);
+cam_x += 10*(cam_dx*_para - cam_dz*_perp);
+cam_y += 10*(keyboard_check(vk_space) - keyboard_check(vk_shift));
+cam_z += 10*(cam_dz*_para + cam_dx*_perp);
 
 //Slightly weird use of lerp() but it works
 fps_smoothed = lerp(fps_smoothed, fps_real, 0.1);

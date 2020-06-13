@@ -35,6 +35,7 @@ var _dae_geometries_list    = ds_list_create();
 var _dae_visual_scenes_list = ds_list_create();
 
 global.__dae_vertex_format      = _vformat;
+global.__dae_flip_texcoords     = _flip_texcoords;
 global.__dae_object_map         = _dae_object_map;
 global.__dae_object_stack       = ds_list_create();
 global.__dae_effects_list       = _dae_effects_list;

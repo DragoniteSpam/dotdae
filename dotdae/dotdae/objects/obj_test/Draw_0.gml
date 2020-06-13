@@ -3,7 +3,7 @@ gpu_set_ztestenable(true);
 gpu_set_zwriteenable(true);
 
 //Clockwise faces are backfaces. We want to cull these so we're drawing less
-//gpu_set_cullmode(cull_clockwise);
+gpu_set_cullmode(cull_noculling);
 
 //Interpolation is set <on> in Windows graphics options so this code isn't needed
 //gpu_set_tex_filter(true);
@@ -25,10 +25,10 @@ var _old_projection = matrix_get(matrix_projection);
 matrix_set(matrix_view, matrix_build_lookat(cam_x, cam_y, cam_z,
                                             cam_x+cam_dx, cam_y+cam_dy, cam_z+cam_dz,
                                             0, 1, 0));
-matrix_set(matrix_projection, matrix_build_projection_perspective_fov(90, room_width/room_height, 1, 3000));
+matrix_set(matrix_projection, matrix_build_projection_perspective_fov(90, room_width/room_height, 1, 6000));
 
 //Finally, draw the model
-matrix_set(matrix_world, matrix_build(0,0,0,   0,90,90,   100, 100, 100));
+matrix_set(matrix_world, matrix_build(0,0,0,   0,0,0,   10, 10, 10));
 dotdae_model_draw_diffuse(model);
 
 //Reset draw state

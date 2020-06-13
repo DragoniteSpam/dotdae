@@ -20,13 +20,14 @@ switch(_tag)
     
     #region Libraries
     
-    case "library_effects":       _context = "effect";       break;
-    case "library_materials":     _context = "material";     break;
-    case "library_images":        _context = "image";        break;
-    case "library_geometries":    _context = "geometry";     break;
-    case "library_visual_scenes": _context = "visual scene"; break;
-    case "library_lights":        _context = "light";        break;
-    case "library_cameras":       _context = "camera";       break;
+    case "library_effects":       _context = "effect";       _parse_children = false; break;
+    case "library_materials":     _context = "material";     _parse_children = false; break;
+    case "library_images":        _context = "image";        _parse_children = false; break;
+    case "library_geometries":    _context = "geometry";                              break;
+    case "library_visual_scenes": _context = "visual scene"; _parse_children = false; break;
+    case "library_lights":        _context = "light";        _parse_children = false; break;
+    case "library_cameras":       _context = "camera";       _parse_children = false; break;
+    case "library_animations":    _context = "animation";    _parse_children = false; break;
     
     #endregion
     
@@ -94,8 +95,11 @@ switch(_tag)
         
         var _object = dotdae_object_new_push(_id, _tag, eDotDaeSource.__Size, undefined);
         
-        var _parent_source_array = _parent[eDotDaeGeometry.MeshArray];
-        _parent_source_array[@ array_length_1d(_parent_source_array)] = _object;
+        if (_context == "geometry")
+        {
+            var _parent_source_array = _parent[eDotDaeMesh.SourceArray];
+            _parent_source_array[@ array_length_1d(_parent_source_array)] = _object;
+        }
     break;
     
     case "float_array":
@@ -103,12 +107,12 @@ switch(_tag)
         {
             Name, //Must be the same as __DOTDAE_NAME_INDEX
             Type, //Must be the same as __DOTDAE_TYPE_INDEX
-            Array,
+            List,
             __Size
         }
         
         var _object = dotdae_object_new(_id, _tag, eDotDaeFloatArray.__Size, undefined);
-        _object[@ eDotDaeFloatArray.Array] = dotdae_string_array_decompose(_content);
+        _object[@ eDotDaeFloatArray.List] = dotdae_string_decompose_list(_content);
         global.__dae_object[@ eDotDaeSource.FloatArray] = _object;
     break;
     
@@ -130,6 +134,7 @@ switch(_tag)
     break;
     
     case "triangles":
+    case "polylist":
         enum eDotDaeTriangles
         {
             Name, //Must be the same as __DOTDAE_NAME_INDEX
@@ -157,78 +162,136 @@ switch(_tag)
             __Size
         }
         
-        var _parent = global.__dae_object;
-        
-        var _object = dotdae_object_new(_id, _tag, eDotDaeInput.__Size, undefined);
-        _object[@ eDotDaeInput.Semantic] = _map[? "semantic"];
-        _object[@ eDotDaeInput.Source  ] = _map[? "source"  ];
-        _object[@ eDotDaeInput.Offset  ] = _map[? "offset"  ];
-        
-        if (_parent[__DOTDAE_TYPE_INDEX] == "vertices")
+        if (_context == "geometry")
         {
-            var _parent_source_array = _parent[eDotDaeVertices.InputArray];
-            _parent_source_array[@ array_length_1d(_parent_source_array)] = _object;
-        }
-        else if (_parent[__DOTDAE_TYPE_INDEX] == "triangles")
-        {
-            var _parent_source_array = _parent[eDotDaeTriangles.InputArray];
-            _parent_source_array[@ array_length_1d(_parent_source_array)] = _object;
+            var _parent = global.__dae_object;
+            
+            var _object = dotdae_object_new(_id, _tag, eDotDaeInput.__Size, undefined);
+            _object[@ eDotDaeInput.Semantic] = _map[? "semantic"];
+            _object[@ eDotDaeInput.Source  ] = _map[? "source"  ];
+            _object[@ eDotDaeInput.Offset  ] = _map[? "offset"  ];
+            
+            if (_parent[__DOTDAE_TYPE_INDEX] == "vertices")
+            {
+                var _parent_source_array = _parent[eDotDaeVertices.InputArray];
+                _parent_source_array[@ array_length_1d(_parent_source_array)] = _object;
+            }
+            else if ((_parent[__DOTDAE_TYPE_INDEX] == "triangles") || (_parent[__DOTDAE_TYPE_INDEX] == "polylist"))
+            {
+                var _parent_source_array = _parent[eDotDaeTriangles.InputArray];
+                _parent_source_array[@ array_length_1d(_parent_source_array)] = _object;
+            }
         }
     break;
     
     case "p":
-        var _input_array    = global.__dae_object[eDotDaeTriangles.InputArray];
-        var _semantic_array = array_create(array_length_1d(_input_array), undefined);
-        var _data_array     = array_create(array_length_1d(_input_array), undefined);
+        var _input_array = global.__dae_object[eDotDaeTriangles.InputArray];
+        var _input_count = array_length_1d(_input_array);
+        
+        var _index_list  = dotdae_string_decompose_list(_content);
+        var _index_count = ds_list_size(_index_list);
+        
+        var _vertex_count = _index_count div _input_count;
+        
+        var _position_index_list = ds_list_create();
+        var _normal_index_list   = ds_list_create();
+        var _colour_index_list   = ds_list_create();
+        var _texcoord_index_list = ds_list_create();
+        
+        var _position_source = undefined;
+        var _normal_source   = undefined;
+        var _colour_source   = undefined;
+        var _texcoord_source = undefined;
         
         var _i = 0;
-        repeat(array_length_1d(_input_array))
+        repeat(_input_count)
         {
-            var _input       = _input_array[_i];
-            var _source      = dotdae_ds_resolve_source(_input[eDotDaeInput.Source]);
-            var _float_array = _source[eDotDaeSource.FloatArray];
+            var _input = _input_array[_i];
             
-            _semantic_array[@ _i] = _input[eDotDaeInput.Semantic];
-            _data_array[@ _i] = _float_array[eDotDaeFloatArray.Array];
+            var _source = dotdae_ds_resolve_source(_input[eDotDaeInput.Source]);
+            var _source_array = _source[eDotDaeSource.FloatArray];
+            
+            var _collection_list = undefined;
+            switch(_input[eDotDaeInput.Semantic])
+            {
+                case "POSITION": _collection_list = _position_index_list; _position_source = _source_array[eDotDaeFloatArray.List]; break;
+                case "VERTEX":   _collection_list = _position_index_list; _position_source = _source_array[eDotDaeFloatArray.List]; break;
+                case "NORMAL":   _collection_list = _normal_index_list;   _normal_source   = _source_array[eDotDaeFloatArray.List]; break;
+                case "COLOR":    _collection_list = _colour_index_list;   _colour_source   = _source_array[eDotDaeFloatArray.List]; break;
+                case "TEXCOORD": _collection_list = _texcoord_index_list; _texcoord_source = _source_array[eDotDaeFloatArray.List]; break;
+            }
+            
+            var _j = real(_input[eDotDaeInput.Offset]);
+            var _k = 0;
+            repeat(_vertex_count)
+            {
+                ds_list_add(_collection_list, _index_list[| _j]);
+                _j += _input_count;
+                ++_k;
+            }
             
             ++_i;
         }
-        
-        var _index_array = dotdae_string_array_decompose(_content);
         
         var _vbuff = vertex_create_buffer();
         vertex_begin(_vbuff, global.__dae_vertex_format);
         
         var _i = 0;
-        var _j = 0;
-        repeat(array_length_1d(_index_array))
+        repeat(_vertex_count)
         {
-            var _index = _index_array[_i];
-            var _data = _data_array[_j];
-            switch(_semantic_array[_j])
+            var _j = _position_index_list[| _i];
+            if (_j != undefined)
             {
-                case "VERTEX":
-                    _index *= 3;
-                    vertex_position_3d(_vbuff, _data[_index], _data[_index+1], _data[_index+2]);
-                    //show_debug_message("pos = (" + string(_data[_index]) + "," + string(_data[_index+1]) + "," + string(_data[_index+2]) + ")");
-                break;
-                
-                case "NORMAL":
-                    _index *= 3;
-                    vertex_normal(_vbuff, _data[_index], _data[_index+1], _data[_index+2]);
-                    //show_debug_message("norm = (" + string(_data[_index]) + "," + string(_data[_index+1]) + "," + string(_data[_index+2]) + ")");
-                break;
-                
-                case "TEXCOORD":
-                    _index *= 2;
-                    vertex_texcoord(_vbuff, _data[_index], _data[_index+1]);
-                    //show_debug_message("uv = (" + string(_data[_index]) + "," + string(_data[_index+1]) + ")");
-                break;
+                _j *= 3;
+                vertex_position_3d(_vbuff, _position_source[| _j], _position_source[| _j+1], _position_source[| _j+2]);
+            }
+            else
+            {
+                vertex_position_3d(_vbuff, 0, 0, 0);
+            }
+            
+            var _j = _normal_index_list[| _i];
+            if (_j != undefined)
+            {
+                _j *= 3;
+                vertex_normal(_vbuff, _normal_source[| _j], _normal_source[| _j+1], _normal_source[| _j+2]);
+            }
+            else
+            {
+                vertex_normal(_vbuff, 0, 0, 0);
+            }
+            
+            var _j = _colour_index_list[| _i];
+            if (_j != undefined)
+            {
+                _j *= 3;
+                var _colour = make_colour_rgb(255*_colour_source[| _j], 255*_colour_source[| _j+1], 255*_colour_source[| _j+2]);
+                vertex_color(_vbuff, _colour, 1.0);
+            }
+            else
+            {
+                vertex_colour(_vbuff, c_white, 1.0);
+            }
+            
+            var _j = _texcoord_index_list[| _i];
+            if (_j != undefined)
+            {
+                _j *= 2;
+                if (global.__dae_flip_texcoords)
+                {
+                    vertex_texcoord(_vbuff, _texcoord_source[| _j], 1.0 - _texcoord_source[| _j+1]);
+                }
+                else
+                {
+                    vertex_texcoord(_vbuff, _texcoord_source[| _j], _texcoord_source[| _j+1]);
+                }
+            }
+            else
+            {
+                vertex_texcoord(_vbuff, 0, 0);
             }
             
             ++_i;
-            ++_j;
-            if (_j >= 3) _j = 0;
         }
         
         vertex_end(_vbuff);

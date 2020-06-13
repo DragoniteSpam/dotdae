@@ -2,7 +2,7 @@
 
 var _model = argument0;
 
-shader_set(shd_dotdae_pnt);
+shader_set(shd_dotdae_pnct);
 
 var _g = 0;
 repeat(ds_list_size(global.__dae_geometries_list))
@@ -15,7 +15,7 @@ repeat(ds_list_size(global.__dae_geometries_list))
     {
         var _mesh = _mesh_array[_m];
         var _vbuff = _mesh[eDotDaeMesh.VertexBuffer];
-        vertex_submit(_vbuff, pr_trianglelist, -1);
+        vertex_submit(_vbuff, pr_trianglelist, sprite_get_texture(tex_dragon, 0));
         ++_m;
     }
     

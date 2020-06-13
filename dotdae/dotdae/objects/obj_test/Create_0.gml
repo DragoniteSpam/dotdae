@@ -2,7 +2,7 @@
 vertex_format_begin();
 vertex_format_add_position_3d();     //              12
 vertex_format_add_normal();          //            + 12
-//vertex_format_add_colour();          //            +  4
+vertex_format_add_colour();          //            +  4
 vertex_format_add_texcoord();        //            +  8
 vertex_format = vertex_format_end(); //vertex size = 36
 
@@ -11,7 +11,7 @@ dotdae_init();
 
 //Load our .dae from disk. This might take a while!
 //The script returns a dotdae model (in reality, an array) that we can draw in the Draw event
-model = dotdae_model_load_file("monkey.dae", vertex_format, true, true);
+model = dotdae_model_load_file("sponza.dae", vertex_format, true, true);
 
 //Mouse lock variables (press F3 to lock the mouse and use mouselook)
 mouse_lock = false;
