@@ -15,10 +15,10 @@
 /// range (0,0) -> (1,1). Please use another script to remap texture coordinates
 /// to GameMaker's atlased UV space.
 /// 
-/// @param filename        File to read from
-/// @param vertexFormat    Vertex format to use. See above for details on what vertex formats are supported
-/// @param flipUVs         Whether to flip the y-axis (V-component) of the texture coordinates. This is useful to correct for DirectX / OpenGL idiosyncrasies
-/// @param reverseTris     Whether to reverse the triangle definition order to be compatible with the culling mode of your choice (clockwise/counter-clockwise)
+/// @param filename       File to read from
+/// @param vertexFormat   Vertex format to use. See above for details on what vertex formats are supported
+/// @param flipUVs        Whether to flip the y-axis (V-component) of the texture coordinates. This is useful to correct for DirectX / OpenGL idiosyncrasies
+/// @param reverseTris    Whether to reverse the triangle definition order to be compatible with the culling mode of your choice (clockwise/counter-clockwise)
 
 if (DOTDAE_OUTPUT_LOAD_TIME) var _timer = get_timer();
 
@@ -36,6 +36,7 @@ var _dae_visual_scenes_list = ds_list_create();
 
 global.__dae_vertex_format      = _vformat;
 global.__dae_flip_texcoords     = _flip_texcoords;
+global.__dae_reverse_triangles  = _reverse_triangles;
 global.__dae_object_map         = _dae_object_map;
 global.__dae_object_stack       = ds_list_create();
 global.__dae_effects_list       = _dae_effects_list;

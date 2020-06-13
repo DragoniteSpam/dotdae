@@ -237,6 +237,7 @@ switch(_tag)
         vertex_begin(_vbuff, global.__dae_vertex_format);
         
         var _i = 0;
+        var _r = 0;
         repeat(_vertex_count)
         {
             var _j = _position_index_list[| _i];
@@ -291,7 +292,17 @@ switch(_tag)
                 vertex_texcoord(_vbuff, 0, 0);
             }
             
-            ++_i;
+            if (global.__dae_reverse_triangles)
+            {
+                //Generate a 021 pattern
+                if (_r == 1) --_i else _i += 2;
+                ++_r;
+                if (_r >= 3) _r = 0;
+            }
+            else
+            {
+                ++_i;
+            }
         }
         
         vertex_end(_vbuff);
