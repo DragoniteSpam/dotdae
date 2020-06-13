@@ -20,14 +20,14 @@ switch(_tag)
     
     #region Libraries
     
-    case "library_effects":       _context = "effect";       _parse_children = false; break;
-    case "library_materials":     _context = "material";     _parse_children = false; break;
-    case "library_images":        _context = "image";        _parse_children = false; break;
+    case "library_effects":       _context = "effect";       _parse_children = false; break; //Unsupported for now
+    case "library_materials":     _context = "material";     _parse_children = false; break; //Unsupported for now
+    case "library_images":        _context = "image";        _parse_children = false; break; //Unsupported for now
     case "library_geometries":    _context = "geometry";                              break;
-    case "library_visual_scenes": _context = "visual scene"; _parse_children = false; break;
-    case "library_lights":        _context = "light";        _parse_children = false; break;
-    case "library_cameras":       _context = "camera";       _parse_children = false; break;
-    case "library_animations":    _context = "animation";    _parse_children = false; break;
+    case "library_visual_scenes": _context = "visual scene"; _parse_children = false; break; //Unsupported for now
+    case "library_lights":        _context = "light";        _parse_children = false; break; //Unsupported for now
+    case "library_cameras":       _context = "camera";       _parse_children = false; break; //Unsupported for now
+    case "library_animations":    _context = "animation";    _parse_children = false; break; //Unsupported for now
     
     #endregion
     
