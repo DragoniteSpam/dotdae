@@ -8,8 +8,6 @@
 /// - Normal
 /// - Colour
 /// - Texture Coordinate
-/// If your preferred vertex format does not have normals or texture coordinates,
-/// use the "writeNormals" and/or "writeTexcoords" to toggle writing that data.
 /// 
 /// Texture coordinates for a .dae model will typically be normalised and in the
 /// range (0,0) -> (1,1). Please use another script to remap texture coordinates
