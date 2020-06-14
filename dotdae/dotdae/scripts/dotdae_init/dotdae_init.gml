@@ -1,12 +1,30 @@
 global.dae_image_library = ds_map_create();
 
 //Used to express what vertex format a vertex buffer requires
-#macro DOTDAE_FORMAT_P    1 //Position
-#macro DOTDAE_FORMAT_N    2 //Normal
-#macro DOTDAE_FORMAT_C    4 //Colour
-#macro DOTDAE_FORMAT_T    8 //Texcoord
-#macro DOTDAE_FORMAT_J   16 //Joint Index   N.B. Not implemented (2020-06-14)
-#macro DOTDAE_FORMAT_W   32 //Joint Weight  N.B. Not implemented (2020-06-14)
+#macro DOTDAE_FORMAT_P   (1 << 0)   //Position
+#macro DOTDAE_FORMAT_N   (1 << 1)   //Normal
+#macro DOTDAE_FORMAT_C   (1 << 2)   //Colour
+#macro DOTDAE_FORMAT_T   (1 << 3)   //Texcoord
+#macro DOTDAE_FORMAT_J   (1 << 4)   //Joint Index   N.B. Not implemented (2020-06-14)
+#macro DOTDAE_FORMAT_W   (1 << 5)   //Joint Weight  N.B. Not implemented (2020-06-14)
+
+//Define the position-normal-colour-texcoord vertex format
+vertex_format_begin();
+vertex_format_add_position_3d();                 //              12
+vertex_format_add_normal();                      //            + 12
+vertex_format_add_colour();                      //            +  4
+vertex_format_add_texcoord();                    //            +  8
+global.__dae_vformat_pnct = vertex_format_end(); //vertex size = 36
+
+//Define the position-normal-colour-texcoord-joint-weight vertex format
+vertex_format_begin();
+vertex_format_add_position_3d();                   //              12
+vertex_format_add_normal();                        //            + 12
+vertex_format_add_colour();                        //            +  4
+vertex_format_add_texcoord();                      //            +  8
+vertex_format_add_colour();                        //            +  4
+vertex_format_add_colour();                        //            +  4
+global.__dae_vformat_pnctjw = vertex_format_end(); //vertex size = 44
 
 #region Internal Object Enums
 
@@ -30,6 +48,7 @@ enum eDotDaeImage
     RelativePath,
     Sprite,
     Texture,
+    External,
     __Size
 }
 
@@ -135,7 +154,7 @@ enum eDotDaeVertices
     __Size
 }
 
-enum eDotDaeVertexBuffer
+enum eDotDaePolyList
 {
     Name, //Must be the same as __DOTDAE_NAME_INDEX
     Type, //Must be the same as __DOTDAE_TYPE_INDEX

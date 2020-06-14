@@ -28,6 +28,7 @@ switch(_tag)
     case "library_lights":        _context = "light";        _parse_children = false; break; //Unsupported for now
     case "library_cameras":       _context = "camera";       _parse_children = false; break; //Unsupported for now
     case "library_animations":    _context = "animation";    _parse_children = false; break; //Unsupported for now
+    case "library_controllers":   _context = "controller";   _parse_children = false; break; //Unsupported for now
     
     #endregion
     
@@ -46,29 +47,39 @@ switch(_tag)
         _parse_children = false;
         
         var _relative_path = _object[eDotDaeImage.RelativePath];
-        var _char_at = string_char_at(_relative_path, 1);
-        if ((_char_at == "/") || (_char_at == "\\")) _relative_path = string_delete(_relative_path, 1, 1);
+        _relative_path = string_replace_all(_relative_path, "/", "\\");
+        if (string_char_at(_relative_path, 1) == "\\") _relative_path = string_delete(_relative_path, 1, 1);
         
         if (_relative_path != undefined)
         {
             var _existing_data = global.dae_image_library[? _relative_path];
             if (is_array(_existing_data))
             {
-                _object[@ eDotDaeImage.Sprite ] = _existing_data[eDotDaeImage.Sprite ];
-                _object[@ eDotDaeImage.Texture] = _existing_data[eDotDaeImage.Texture];
+                _object[@ eDotDaeImage.Sprite  ] = _existing_data[eDotDaeImage.Sprite  ];
+                _object[@ eDotDaeImage.Texture ] = _existing_data[eDotDaeImage.Texture ];
+                _object[@ eDotDaeImage.External] = _existing_data[eDotDaeImage.External];
                 
                 if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Image \"", _id, "\" from \"", _relative_path, "\" was previously added (sprite=", _object[eDotDaeImage.Sprite], ", texture=", _object[eDotDaeImage.Texture], ")");
             }
             else
             {
-                var _sprite  = sprite_add(_relative_path, 0, false, false, 0, 0);
-                var _texture = sprite_get_texture(_sprite, 0);
-                if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Image \"", _id, "\" added from \"", _relative_path, "\" (sprite=", _sprite, ", texture=", _texture, ")");
-                
-                
-                _object[@ eDotDaeImage.Sprite ] = _sprite;
-                _object[@ eDotDaeImage.Texture] = sprite_get_texture(_sprite, 0);
-                global.dae_image_library[? _relative_path] = _object;
+                var _sprite = sprite_add(_relative_path, 0, false, false, 0, 0);
+                if (_sprite < 0)
+                {
+                    __dotdae_trace("ERROR! Image \"", _id, "\" is sourced from \"", _relative_path, "\", but the file could not be found");
+                    _object[@ eDotDaeImage.Texture ] = -1;
+                    _object[@ eDotDaeImage.External] = false;
+                }
+                else
+                {
+                    var _texture = sprite_get_texture(_sprite, 0);
+                    if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Image \"", _id, "\" added from \"", _relative_path, "\" (sprite=", _sprite, ", texture=", _texture, ")");
+                    
+                    _object[@ eDotDaeImage.Sprite  ] = _sprite;
+                    _object[@ eDotDaeImage.Texture ] = sprite_get_texture(_sprite, 0);
+                    _object[@ eDotDaeImage.External] = true;
+                    global.dae_image_library[? _relative_path] = _object;
+                }
             }
         }
     break;
@@ -239,9 +250,9 @@ switch(_tag)
         var _parent = global.__dae_object;
         var _vbuff_array = _parent[eDotDaeMesh.VertexBufferArray];
         
-        var _object = __dotdae_object_new_push(_parent[__DOTDAE_NAME_INDEX], _tag, eDotDaeVertexBuffer.__Size, global.__dae_vertex_buffers_list);
-        _object[@ eDotDaeVertexBuffer.Material  ] = _map[? "material"];
-        _object[@ eDotDaeVertexBuffer.InputArray] = [];
+        var _object = __dotdae_object_new_push(_parent[__DOTDAE_NAME_INDEX], _tag, eDotDaePolyList.__Size, global.__dae_vertex_buffers_list);
+        _object[@ eDotDaePolyList.Material  ] = _map[? "material"];
+        _object[@ eDotDaePolyList.InputArray] = [];
         
         _vbuff_array[@ array_length_1d(_vbuff_array)] = _object;
     break;
@@ -263,14 +274,14 @@ switch(_tag)
             }
             else if ((_parent[__DOTDAE_TYPE_INDEX] == "triangles") || (_parent[__DOTDAE_TYPE_INDEX] == "polylist"))
             {
-                var _parent_source_array = _parent[eDotDaeVertexBuffer.InputArray];
+                var _parent_source_array = _parent[eDotDaePolyList.InputArray];
                 _parent_source_array[@ array_length_1d(_parent_source_array)] = _object;
             }
         }
     break;
     
     case "p":
-        global.__dae_object[@ eDotDaeVertexBuffer.PString] = _content;
+        global.__dae_object[@ eDotDaePolyList.PString] = _content;
     break;
     
     #endregion

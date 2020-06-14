@@ -3,12 +3,6 @@
 /// 
 /// This isn't a full implementation of the .dae format, but it's a starting point at least
 /// 
-/// This script expects the vertex format to be setup as follows:
-/// - 3D Position
-/// - Normal
-/// - Colour
-/// - Texture Coordinate
-/// 
 /// Texture coordinates for a .dae model will typically be normalised and in the
 /// range (0,0) -> (1,1). Please use another script to remap texture coordinates
 /// to GameMaker's atlased UV space.
@@ -21,9 +15,8 @@
 if (DOTDAE_OUTPUT_LOAD_TIME) var _timer = get_timer();
 
 var _buffer            = argument0;
-var _vformat           = argument1;
-var _flip_texcoords    = argument2;
-var _reverse_triangles = argument3;
+var _flip_texcoords    = argument1;
+var _reverse_triangles = argument2;
 
 var _dae_object_map          = ds_map_create();
 var _dae_effects_list        = ds_list_create();
@@ -91,11 +84,18 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
     var _object = _dae_vertex_buffers_list[| _v];
     
     //Get our material data
-    var _material_name = _object[eDotDaeVertexBuffer.Material];
+    var _material_name = _object[eDotDaePolyList.Material];
     var _material = _dae_object_map[? _material_name];
     
-    //Set the vertex buffer's effect to the material's effect
-    _object[@ eDotDaeVertexBuffer.Effect] = _material[eDotDaeMaterial.InstanceOf];
+    if (is_array(_material))
+    {
+        //Set the vertex buffer's effect to the material's effect
+        _object[@ eDotDaePolyList.Effect] = _material[eDotDaeMaterial.InstanceOf];
+    }
+    else
+    {
+        __dotdae_trace("WARNING! \"", _object[eDotDaePolyList.Name], "\" has an invalid material, or the material cannot be found (material=\"", _material_name, "\")");
+    }
     
     ++_v;
 }
@@ -111,10 +111,10 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
     //Grab our object definition from our list of vertex buffers
     var _object = _dae_vertex_buffers_list[| _v];
     
-    if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Building \"", _object[eDotDaeVertexBuffer.Name], "\" using material \"", _object[eDotDaeVertexBuffer.Material], "\"");
+    if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Building \"", _object[eDotDaePolyList.Name], "\" using material \"", _object[eDotDaePolyList.Material], "\"");
     
-    var _pstring     = _object[eDotDaeVertexBuffer.PString   ];
-    var _input_array = _object[eDotDaeVertexBuffer.InputArray]; //Get our array that describes the vertex buffer layout
+    var _pstring     = _object[eDotDaePolyList.PString   ];
+    var _input_array = _object[eDotDaePolyList.InputArray]; //Get our array that describes the vertex buffer layout
     
     //Break down the string found in the <p> tag into a list of indexes
     var _index_list  = __dotdae_string_decompose_list(_pstring);
@@ -215,18 +215,21 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
                      + DOTDAE_FORMAT_N*_enough_normals
                      + DOTDAE_FORMAT_C*_enough_colours
                      + DOTDAE_FORMAT_T*_enough_texcoords;
-    _object[@ eDotDaeVertexBuffer.FormatCode] = _format_code;
+    _object[@ eDotDaePolyList.FormatCode] = _format_code;
+    
+    if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("              ^-- Format Code = ", _format_code);
     
     //Now create our vertex buffer based on what format code we have
     //This seems like a long way round of doing things, but it ends up being more efficient
     //By checking what format to use *outside* the vertex writing loop we avoid potentially hundreds of thousands of unnecessary if-statements
     var _vbuff = vertex_create_buffer();
-    vertex_begin(_vbuff, _vformat);
     
     switch(_format_code)
     {
         case DOTDAE_FORMAT_P + DOTDAE_FORMAT_N + DOTDAE_FORMAT_C + DOTDAE_FORMAT_T:
             #region Position, Normal, Colour, Texcoord
+            
+            vertex_begin(_vbuff, global.__dae_vformat_pnct);
             
             //Write all of our data - position, normal, colour, texcoord
             var _i = 0;
@@ -277,6 +280,8 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
         case DOTDAE_FORMAT_P + DOTDAE_FORMAT_C + DOTDAE_FORMAT_T:
             #region Position, Colour, Texcoord
             
+            vertex_begin(_vbuff, global.__dae_vformat_pnct);
+            
             //Write position, colour, texcoord
             var _i = 0;
             var _r = 0;
@@ -325,6 +330,8 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
         case DOTDAE_FORMAT_P + DOTDAE_FORMAT_N + DOTDAE_FORMAT_T:
             #region Position, Normal, Texcoord
             
+            vertex_begin(_vbuff, global.__dae_vformat_pnct);
+            
             //Write position, normal, texcoord
             var _i = 0;
             var _r = 0;
@@ -372,8 +379,10 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
         default:
             #region Fallback
             
+            vertex_begin(_vbuff, global.__dae_vformat_pnct);
+
             //If this specific format code isn't supported then write using some slow generic code
-            __dotdae_trace("Warning! Using slow vertex writer for format code ", _format_code);
+            __dotdae_trace("WARNING! Using slow vertex writer for unsupported format code (", _format_code, ")");
             
             var _i = 0;
             var _r = 0;
@@ -454,7 +463,7 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
     }
     
     vertex_end(_vbuff);
-    _object[@ eDotDaeVertexBuffer.VertexBuffer] = _vbuff;
+    _object[@ eDotDaePolyList.VertexBuffer] = _vbuff;
     
     //Clean up the mess we made
     ds_list_destroy(_index_list);

@@ -111,6 +111,14 @@
             }
         },
         {
+            "Key": "2019ea4a-6e1d-4cc5-bf8b-9d41885ac6af",
+            "Value": {
+                "id": "bfa2bb40-5dcf-4986-af7b-faae3f6dfbcb",
+                "resourcePath": "sprites\\tex_lion\\tex_lion.yy",
+                "resourceType": "GMSprite"
+            }
+        },
+        {
             "Key": "211845c8-55ac-4fcc-9458-2872496b9cdb",
             "Value": {
                 "id": "e2508f76-d536-4c41-b1b3-86c8301090fa",
@@ -300,6 +308,14 @@
                 "id": "31ede495-4fa3-4aca-adec-aafa060604a8",
                 "resourcePath": "views\\493df5d5-b65e-486a-b69f-015cd7b28e77.yy",
                 "resourceType": "GMFolder"
+            }
+        },
+        {
+            "Key": "4cd424be-ba34-477a-bcbb-b3cc2ca62874",
+            "Value": {
+                "id": "4c944a4e-783e-4ef8-948e-493e9fd3737a",
+                "resourcePath": "scripts\\dotdae_image_add\\dotdae_image_add.yy",
+                "resourceType": "GMScript"
             }
         },
         {
@@ -887,6 +903,14 @@
             }
         },
         {
+            "Key": "ec26a484-79fa-42f9-b8e2-68d9f006cc02",
+            "Value": {
+                "id": "7eafa6d7-edd8-4e08-bbff-f2b581a212df",
+                "resourcePath": "scripts\\dotdae_model_draw_texture\\dotdae_model_draw_texture.yy",
+                "resourceType": "GMScript"
+            }
+        },
+        {
             "Key": "ec45f546-c876-4bd6-bbf1-6b7026ebcc6f",
             "Value": {
                 "id": "7a31d137-2f7d-4f75-8d0d-daf07563a92b",
@@ -970,12 +994,14 @@
     "script_order": [
         "27d02f83-d0a7-4d6a-b488-28c8d16c42f5",
         "d49399f1-2624-4e28-920e-26fe8c5dc567",
+        "4cd424be-ba34-477a-bcbb-b3cc2ca62874",
         "85b7cc83-748e-4973-851f-b2d7ef79f684",
         "059e2c48-64fb-4581-bd90-6b515cb86387",
         "5e7e4b0a-17e6-4b33-be7a-3f7281a2e51b",
         "b2bb64bd-f8ca-4da3-be62-1fde1f57d7ef",
-        "32e19507-56cd-4b96-ac32-489c4194157e",
+        "ec26a484-79fa-42f9-b8e2-68d9f006cc02",
         "cb5448bb-6e37-445e-99bc-547c02677f25",
+        "32e19507-56cd-4b96-ac32-489c4194157e",
         "889e76ad-eb76-4da9-b55b-056a0ff034a0",
         "f2ec6e98-6e2a-4e8d-97cb-8641cbf63325",
         "22552809-442c-44bc-b884-5538dd16fc52",

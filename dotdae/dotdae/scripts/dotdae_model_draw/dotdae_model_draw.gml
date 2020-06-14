@@ -2,9 +2,7 @@
 
 var _container = argument0;
 
-var _object_map    = _container[eDotDae.ObjectMap   ];
 var _geometry_list = _container[eDotDae.GeometryList];
-
 var _g = 0;
 repeat(ds_list_size(_geometry_list))
 {
@@ -21,8 +19,13 @@ repeat(ds_list_size(_geometry_list))
         repeat(array_length_1d(_vbuff_array))
         {
             var _vertex_buffer = _vbuff_array[_v];
-            var _effect = _vertex_buffer[eDotDaeVertexBuffer.Effect];
-            vertex_submit(_vertex_buffer[eDotDaeVertexBuffer.VertexBuffer], pr_trianglelist, _effect[eDotDaeEffect.DiffuseTexture]);
+            var _diffuse_texture = -1;
+            
+            var _effect = _vertex_buffer[eDotDaePolyList.Effect];
+            if (is_array(_effect)) _diffuse_texture = _effect[eDotDaeEffect.DiffuseTexture];
+            
+            vertex_submit(_vertex_buffer[eDotDaePolyList.VertexBuffer], pr_trianglelist, _diffuse_texture);
+            
             ++_v;
         }
         
