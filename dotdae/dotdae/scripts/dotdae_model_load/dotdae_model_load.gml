@@ -8,7 +8,6 @@
 /// to GameMaker's atlased UV space.
 /// 
 /// @param filename       File to read from
-/// @param vertexFormat   Vertex format to use. See above for details on what vertex formats are supported
 /// @param flipUVs        Whether to flip the y-axis (V-component) of the texture coordinates. This is useful to correct for DirectX / OpenGL idiosyncrasies
 /// @param reverseTris    Whether to reverse the triangle definition order to be compatible with the culling mode of your choice (clockwise/counter-clockwise)
 
@@ -18,6 +17,7 @@ var _buffer            = argument0;
 var _flip_texcoords    = argument1;
 var _reverse_triangles = argument2;
 
+//Create a bunch of data structures to contain data
 var _dae_object_map          = ds_map_create();
 var _dae_effects_list        = ds_list_create();
 var _dae_materials_list      = ds_list_create();
@@ -25,6 +25,7 @@ var _dae_images_list         = ds_list_create();
 var _dae_geometries_list     = ds_list_create();
 var _dae_vertex_buffers_list = ds_list_create();
 
+//Make a container array and add the data structures to it
 var _container = array_create(eDotDae.__Size, undefined);
 _container[@ eDotDae.Name            ] = "<unnamed>";
 _container[@ eDotDae.Type            ] = "containter"
@@ -204,17 +205,12 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
         ++_i;
     }
     
-    //Check if we have sufficient data in every index list
-    var _enough_positions = (ds_list_size(_position_index_list) >= _vertex_count);
-    var _enough_normals   = (ds_list_size(_normal_index_list  ) >= _vertex_count);
-    var _enough_colours   = (ds_list_size(_colour_index_list  ) >= _vertex_count);
-    var _enough_texcoords = (ds_list_size(_texcoord_index_list) >= _vertex_count);
-    
-    //Figure out a format code from the above booleans
-    var _format_code = DOTDAE_FORMAT_P*_enough_positions
-                     + DOTDAE_FORMAT_N*_enough_normals
-                     + DOTDAE_FORMAT_C*_enough_colours
-                     + DOTDAE_FORMAT_T*_enough_texcoords;
+    //Figure out a format code based on which index lists have sufficient data
+    var _format_code = 0;
+    if (ds_list_size(_position_index_list) >= _vertex_count) _format_code |= DOTDAE_FORMAT_P;
+    if (ds_list_size(_normal_index_list  ) >= _vertex_count) _format_code |= DOTDAE_FORMAT_N;
+    if (ds_list_size(_colour_index_list  ) >= _vertex_count) _format_code |= DOTDAE_FORMAT_C;
+    if (ds_list_size(_texcoord_index_list) >= _vertex_count) _format_code |= DOTDAE_FORMAT_T;
     _object[@ eDotDaePolyList.FormatCode] = _format_code;
     
     if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("              ^-- Format Code = ", _format_code);
@@ -226,7 +222,7 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
     
     switch(_format_code)
     {
-        case DOTDAE_FORMAT_P + DOTDAE_FORMAT_N + DOTDAE_FORMAT_C + DOTDAE_FORMAT_T:
+        case (DOTDAE_FORMAT_P | DOTDAE_FORMAT_N | DOTDAE_FORMAT_C | DOTDAE_FORMAT_T):
             #region Position, Normal, Colour, Texcoord
             
             vertex_begin(_vbuff, global.__dae_vformat_pnct);
@@ -277,7 +273,7 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
             #endregion
         break;
         
-        case DOTDAE_FORMAT_P + DOTDAE_FORMAT_C + DOTDAE_FORMAT_T:
+        case (DOTDAE_FORMAT_P | DOTDAE_FORMAT_C | DOTDAE_FORMAT_T):
             #region Position, Colour, Texcoord
             
             vertex_begin(_vbuff, global.__dae_vformat_pnct);
@@ -327,7 +323,7 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
             #endregion
         break;
         
-        case DOTDAE_FORMAT_P + DOTDAE_FORMAT_N + DOTDAE_FORMAT_T:
+        case (DOTDAE_FORMAT_P | DOTDAE_FORMAT_N | DOTDAE_FORMAT_T):
             #region Position, Normal, Texcoord
             
             vertex_begin(_vbuff, global.__dae_vformat_pnct);

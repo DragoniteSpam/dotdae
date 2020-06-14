@@ -1,6 +1,7 @@
 global.dae_image_library = ds_map_create();
 
 //Used to express what vertex format a vertex buffer requires
+//Format codes are made from bitflags
 #macro DOTDAE_FORMAT_P   (1 << 0)   //Position
 #macro DOTDAE_FORMAT_N   (1 << 1)   //Normal
 #macro DOTDAE_FORMAT_C   (1 << 2)   //Colour
