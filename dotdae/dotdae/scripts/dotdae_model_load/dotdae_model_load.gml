@@ -24,6 +24,7 @@ var _dae_materials_list      = ds_list_create();
 var _dae_images_list         = ds_list_create();
 var _dae_geometries_list     = ds_list_create();
 var _dae_vertex_buffers_list = ds_list_create();
+var _dae_controllers_list    = ds_list_create();
 
 //Make a container array and add the data structures to it
 var _container = array_create(eDotDae.__Size, undefined);
@@ -35,6 +36,7 @@ _container[@ eDotDae.MaterialList    ] = _dae_materials_list;
 _container[@ eDotDae.ImageList       ] = _dae_images_list;
 _container[@ eDotDae.GeometryList    ] = _dae_geometries_list;
 _container[@ eDotDae.VertexBufferList] = _dae_vertex_buffers_list;
+_container[@ eDotDae.ControllerList  ] = _dae_controllers_list;
 
 //Define some global variables that'll get referenced in __dotdae_model_load_inner()
 global.__dae_stack               = ds_list_create();
@@ -44,6 +46,7 @@ global.__dae_materials_list      = _dae_materials_list;
 global.__dae_images_list         = _dae_images_list;
 global.__dae_geometries_list     = _dae_geometries_list;
 global.__dae_vertex_buffers_list = _dae_vertex_buffers_list;
+global.__dae_controllers_list    = _dae_controllers_list;
 
 //Parse the .dae XML found in the buffer
 if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Parsing XML... (This may take some time)");
@@ -114,11 +117,12 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
     
     if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Building \"", _object[eDotDaePolyList.Name], "\" using material \"", _object[eDotDaePolyList.Material], "\"");
     
-    var _pstring     = _object[eDotDaePolyList.PString   ];
-    var _input_array = _object[eDotDaePolyList.InputArray]; //Get our array that describes the vertex buffer layout
+    var _pstring         = _object[eDotDaePolyList.PString       ];
+    var _input_array     = _object[eDotDaePolyList.InputArray    ]; //Get our array that describes the vertex buffer layout
+    var _controller_name = _object[eDotDaePolyList.SkinController];
     
     //Break down the string found in the <p> tag into a list of indexes
-    var _index_list  = __dotdae_string_decompose_list(_pstring);
+    var _index_list  = __dotdae_string_decompose_list(_pstring, true);
     var _index_count = ds_list_size(_index_list);
     
     //Figure out how many vertices we have
@@ -126,6 +130,11 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
     //TODO - Check that these two values match up and report an error if not (!)
     var _input_count = array_length_1d(_input_array);
     var _vertex_count = _index_count div _input_count;
+    
+    if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("          ^-- triangles = ", _vertex_count/3);
+    if ((_vertex_count/3) != _object[eDotDaePolyList.Count]) __dotdae_trace("WARNING! \"", _object[eDotDaePolyList.Name], "\" triangle count (", _vertex_count/3, ") doesn't match triangle count in source file (", _object[eDotDaePolyList.Count], ")");
+    
+    #region Extract position/normal/colour/texcoord data from the geometry definition
     
     //Create some variables...
     var _position_index_list = ds_list_create();
@@ -205,15 +214,67 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
         ++_i;
     }
     
+    #endregion
+    
+    #region Extract joint weights from the controller definition
+    
+    //Create some variables...
+    var _joint_vertex_count  = 0;
+    var _vstring_lookup_list = ds_list_create();
+    var _vcount_list         = undefined;
+    var _v_list              = undefined;
+    var _weight_source       = undefined;
+    
+    var _controller = _dae_object_map[? _controller_name];
+    if (_controller != undefined)
+    {
+        var _vertex_weights = _controller[eDotDaeController.VertexWeights];
+        _joint_vertex_count = _vertex_weights[eDotDaeVertexWeights.Count];
+        
+        _v_list      = __dotdae_string_decompose_list(_vertex_weights[eDotDaeVertexWeights.VString     ], true);
+        _vcount_list = __dotdae_string_decompose_list(_vertex_weights[eDotDaeVertexWeights.VCountString], true);
+        
+        var _i = 0;
+        var _p = 0;
+        repeat(ds_list_size(_vcount_list))
+        {
+            ds_list_add(_vstring_lookup_list, _p);
+            _p += 2*_vcount_list[| _i];
+        }
+        
+        //Find the joint weight values
+        var _input_array = _vertex_weights[eDotDaeVertexWeights.InputArray];
+        var _i = 0;
+        repeat(array_length_1d(_input_array))
+        {
+            var _input = _input_array[_i];
+            var _source_name = _input[eDotDaeInput.Source  ];
+            var _semantic    = _input[eDotDaeInput.Semantic];
+            
+            if (_semantic == "WEIGHT")
+            {
+                if (string_char_at(_source_name, 1) == "#") _source_name = string_delete(_source_name, 1, 1);
+                var _source = _dae_object_map[? _source_name];
+                var _source_array = _source[eDotDaeSource.FloatArray];
+                _weight_source = _source_array[eDotDaeFloatArray.List];
+            }
+            
+            ++_i;
+        }
+    }
+    
+    #endregion
+    
     //Figure out a format code based on which index lists have sufficient data
     var _format_code = 0;
     if (ds_list_size(_position_index_list) >= _vertex_count) _format_code |= DOTDAE_FORMAT_P;
     if (ds_list_size(_normal_index_list  ) >= _vertex_count) _format_code |= DOTDAE_FORMAT_N;
     if (ds_list_size(_colour_index_list  ) >= _vertex_count) _format_code |= DOTDAE_FORMAT_C;
     if (ds_list_size(_texcoord_index_list) >= _vertex_count) _format_code |= DOTDAE_FORMAT_T;
+    if ((_joint_vertex_count >= ds_list_size(_position_source)/3) && (_weight_source != undefined)) _format_code |= DOTDAE_FORMAT_J;
     _object[@ eDotDaePolyList.FormatCode] = _format_code;
     
-    if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("              ^-- Format Code = ", _format_code);
+    if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("          ^-- format code = ", _format_code);
     
     //Now create our vertex buffer based on what format code we have
     //This seems like a long way round of doing things, but it ends up being more efficient
@@ -222,6 +283,88 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
     
     switch(_format_code)
     {
+        case (DOTDAE_FORMAT_P | DOTDAE_FORMAT_N | DOTDAE_FORMAT_C | DOTDAE_FORMAT_T | DOTDAE_FORMAT_J):
+            #region Position, Normal, Colour, Texcoord, Joint Weights
+            
+            if (_reverse_triangles) show_error("dotdae:\nReversed triangles not supported for models with joint weights\n ", false);
+            
+            vertex_begin(_vbuff, global.__dae_vformat_pnctj);
+            
+            //Write all of our data - position, normal, colour, texcoord
+            var _i = 0;
+            var _j = 0;
+            repeat(_vertex_count)
+            {
+                //Write the position
+                var _v = _position_index_list[| _i];
+                var _q = 3*_v;
+                vertex_position_3d(_vbuff, _position_source[| _q], _position_source[| _q+1], _position_source[| _q+2]);
+                
+                //Write the normal
+                var _q = 3*_normal_index_list[| _i];
+                vertex_normal(_vbuff, _normal_source[| _q], _normal_source[| _q+1], _normal_source[| _q+2]);
+                
+                //Write the colour
+                var _q = 3*_colour_index_list[| _i];
+                var _colour = make_colour_rgb(255*_colour_source[| _q], 255*_colour_source[| _q+1], 255*_colour_source[| _q+2]);
+                vertex_color(_vbuff, _colour, 1.0);
+                
+                //Write the UV
+                var _q = 2*_texcoord_index_list[| _i];
+                if (_flip_texcoords) //TODO - Move this if-check outside the loop?
+                {
+                    vertex_texcoord(_vbuff, _texcoord_source[| _q], 1.0 - _texcoord_source[| _q+1]);
+                }
+                else
+                {
+                    vertex_texcoord(_vbuff, _texcoord_source[| _q], _texcoord_source[| _q+1]);
+                }
+                
+                //Write joint indexes/weights
+                var _pos = _vstring_lookup_list[| _v];
+                var _joint_count = _vcount_list[| _v];
+                switch(_joint_count)
+                {
+                    case 0:
+                        vertex_float4(_vbuff, 0, 0, 0, 0);
+                        vertex_float4(_vbuff, 0, 0, 0, 0);
+                    break;
+                    
+                    case 1:
+                        vertex_float4(_vbuff,                  _v_list[| _pos   ], 0, 0, 0);
+                        vertex_float4(_vbuff, _weight_source[| _v_list[| _pos+1]], 0, 0, 0);
+                    break;
+                    
+                    case 2:
+                        vertex_float4(_vbuff,                  _v_list[| _pos  ] ,                  _v_list[| _pos+2] , 0, 0);
+                        vertex_float4(_vbuff, _weight_source[| _v_list[| _pos+1]], _weight_source[| _v_list[| _pos+3]], 0, 0);
+                    break;
+                    
+                    case 3:
+                        vertex_float4(_vbuff,                  _v_list[| _pos  ] ,                  _v_list[| _pos+2] ,                  _v_list[| _pos+4] , 0);
+                        vertex_float4(_vbuff, _weight_source[| _v_list[| _pos+1]], _weight_source[| _v_list[| _pos+3]], _weight_source[| _v_list[| _pos+5]], 0);
+                    break;
+                    
+                    case 4:
+                        vertex_float4(_vbuff,                  _v_list[| _pos  ] ,                  _v_list[| _pos+2] ,                  _v_list[| _pos+4] ,                  _v_list[| _pos+6] );
+                        vertex_float4(_vbuff, _weight_source[| _v_list[| _pos+1]], _weight_source[| _v_list[| _pos+3]], _weight_source[| _v_list[| _pos+5]], _weight_source[| _v_list[| _pos+7]]);
+                    break;
+                    
+                    //Higher order joint counts we just ignore. I dunno why people are making models with >4 joint weights per vertex, it's rare for a game engine to support that
+                    default:
+                        __dotdae_trace("WARNING! Joint count ", _joint_count, " exceeds maximum (4)");
+                        vertex_float4(_vbuff,                  _v_list[| _pos  ] ,                  _v_list[| _pos+2] ,                  _v_list[| _pos+4] ,                  _v_list[| _pos+6] );
+                        vertex_float4(_vbuff, _weight_source[| _v_list[| _pos+1]], _weight_source[| _v_list[| _pos+3]], _weight_source[| _v_list[| _pos+5]], _weight_source[| _v_list[| _pos+7]]);
+                    break;
+                }
+                
+                //Iterate!
+                ++_i;
+            }
+            
+            #endregion
+        break;
+        
         case (DOTDAE_FORMAT_P | DOTDAE_FORMAT_N | DOTDAE_FORMAT_C | DOTDAE_FORMAT_T):
             #region Position, Normal, Colour, Texcoord
             
@@ -462,11 +605,14 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
     _object[@ eDotDaePolyList.VertexBuffer] = _vbuff;
     
     //Clean up the mess we made
-    ds_list_destroy(_index_list);
+    ds_list_destroy(_index_list         );
     ds_list_destroy(_position_index_list);
     ds_list_destroy(_normal_index_list  );
     ds_list_destroy(_colour_index_list  );
     ds_list_destroy(_texcoord_index_list);
+    ds_list_destroy(_vstring_lookup_list);
+    if (_v_list      != undefined) ds_list_destroy(_v_list     );
+    if (_vcount_list != undefined) ds_list_destroy(_vcount_list);
     
     ++_v;
 }

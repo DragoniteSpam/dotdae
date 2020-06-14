@@ -1,6 +1,8 @@
 /// @param string
+/// @param outputReal
 
-var _string = argument0;
+var _string      = argument0;
+var _output_real = argument1;
 
 var _size = string_byte_length(_string) + 1;
 var _buffer = buffer_create(_size, buffer_fixed, 1);
@@ -18,7 +20,11 @@ repeat(_size)
         buffer_poke(_buffer, buffer_tell(_buffer)-1, buffer_u8, 0x0);
         buffer_seek(_buffer, buffer_seek_start, _substring_start);
         var _substring = buffer_read(_buffer, buffer_string);
-        _array[@ array_length_1d(_array)] = real(_substring);
+        if (_substring != "")
+        {
+            if (_output_real) _substring = real(_substring);
+            _array[@ array_length_1d(_array)] = _substring;
+        }
         _substring_start = buffer_tell(_buffer);
     }
 }

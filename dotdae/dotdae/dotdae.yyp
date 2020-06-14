@@ -759,6 +759,14 @@
             }
         },
         {
+            "Key": "bd6a5e4e-efb6-4942-87ee-a0f1ed916e0d",
+            "Value": {
+                "id": "a0ef7072-86fc-4726-a747-c9a9b72a61a2",
+                "resourcePath": "shaders\\shd_simple_lighting_pnctj\\shd_simple_lighting_pnctj.yy",
+                "resourceType": "GMShader"
+            }
+        },
+        {
             "Key": "bebea391-497a-44f2-8c3f-b50f003a47b2",
             "Value": {
                 "id": "a7ac598a-3942-4a46-a4d7-255db826dabe",

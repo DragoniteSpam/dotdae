@@ -28,6 +28,7 @@ matrix_set(matrix_view, matrix_build_lookat(cam_x, cam_y, cam_z,
 matrix_set(matrix_projection, matrix_build_projection_perspective_fov(90, room_width/room_height, 1, 6000));
 
 //Finally, draw the container
+matrix_set(matrix_world, matrix_build(0,0,0,   0,90,90,   4,4,4));
 shader_set(shd_simple_lighting);
 dotdae_model_draw(container);
 shader_reset();

@@ -28,7 +28,7 @@ switch(_tag)
     case "library_lights":        _context = "light";        _parse_children = false; break; //Unsupported for now
     case "library_cameras":       _context = "camera";       _parse_children = false; break; //Unsupported for now
     case "library_animations":    _context = "animation";    _parse_children = false; break; //Unsupported for now
-    case "library_controllers":   _context = "controller";   _parse_children = false; break; //Unsupported for now
+    case "library_controllers":   _context = "controller";                            break;
     
     #endregion
     
@@ -86,14 +86,73 @@ switch(_tag)
     
     #endregion
     
-    case "init_from":
-        if (_context == "image")
+    #region Controllers
+    
+    case "controller":
+        var _object = __dotdae_object_new_push(_id, _tag, eDotDaeController.__Size, global.__dae_controllers_list);
+        _object[@ eDotDaeController.DisplayName] = _map[? "name"];
+        _object[@ eDotDaeController.SourceArray] = [];
+        
+        if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Controller \"", _id, "\" added");
+    break;
+    
+    case "skin":
+        var _source = _map[? "source"];
+        if (string_char_at(_source, 1) == "#") _source = string_delete(_source, 1, 1);
+        
+        var _polylist = global.__dae_object_map[? _source];
+        _polylist[@ eDotDaePolyList.SkinController] = global.__dae_object_on_stack[__DOTDAE_NAME_INDEX];
+        
+        global.__dae_object_on_stack[eDotDaeController.ControllerType] = "skin";
+        global.__dae_object_on_stack[eDotDaeController.PolyList      ] = _source;
+        if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("            ^-- bound to polylist \"", _source, "\"");
+    break;
+    
+    case "joints":
+        //TODO - We can ignore this for now probably
+        _parse_children = false;
+    break;
+    
+    case "vertex_weights":
+        var _parent = global.__dae_object_on_stack;
+        
+        var _object = __dotdae_object_new_push(_id, _tag, eDotDaeVertexWeights.__Size, undefined);
+        _object[@ eDotDaeVertexWeights.Count     ] = real(_map[? "count"]);
+        _object[@ eDotDaeVertexWeights.InputArray] = [];
+        
+        _parent[@ eDotDaeController.VertexWeights] = _object;
+    break;
+    
+    case "v":
+        global.__dae_object_on_stack[@ eDotDaeVertexWeights.VString] = _content;
+    break;
+    
+    #endregion
+    
+    #region Common
+    
+    case "name_array":
+    case "Name_array": //Weird case insensitive tag name
+        if (_context == "controller")
         {
-            global.__dae_object_on_stack[@ eDotDaeImage.RelativePath] = _content;
+            var _object = __dotdae_object_new(_id, _tag, eDotDaeFloatArray.__Size, undefined);
+            _object[@ eDotDaeFloatArray.List] = __dotdae_string_decompose_list(_content, false);
+            global.__dae_object_on_stack[@ eDotDaeSource.FloatArray] = _object;
         }
-        else if (_context == "effect")
+    break;
+    
+    case "float_array":
+        if (_context == "geometry")
         {
-            global.__dae_parameter[@ eDotDaeParameter.Value] = _content;
+            var _object = __dotdae_object_new(_id, _tag, eDotDaeFloatArray.__Size, undefined);
+            _object[@ eDotDaeFloatArray.List] = __dotdae_string_decompose_list(_content, true);
+            global.__dae_object_on_stack[@ eDotDaeSource.FloatArray] = _object;
+        }
+        else if (_context == "controller")
+        {
+            var _object = __dotdae_object_new(_id, _tag, eDotDaeFloatArray.__Size, undefined);
+            _object[@ eDotDaeFloatArray.List] = __dotdae_string_decompose_list(_content, true);
+            global.__dae_object_on_stack[@ eDotDaeSource.FloatArray] = _object;
         }
     break;
     
@@ -105,6 +164,74 @@ switch(_tag)
             
             var _parent_source_array = _parent[eDotDaeMesh.SourceArray];
             _parent_source_array[@ array_length_1d(_parent_source_array)] = _object;
+        }
+        else if (_context == "controller")
+        {
+            var _parent = global.__dae_object_on_stack;
+            var _object = __dotdae_object_new_push(_id, _tag, eDotDaeSource.__Size, undefined);
+            
+            var _parent_source_array = _parent[eDotDaeController.SourceArray];
+            _parent_source_array[@ array_length_1d(_parent_source_array)] = _object;
+        }
+        else if (_context == "effect")
+        {
+            global.__dae_parameter[@ eDotDaeParameter.Value] = _content;
+        }
+    break;
+    
+    case "vcount":
+        if (_context == "geometry")
+        {
+            //TODO - Support flexible vcount
+        }
+        else if (_context == "controller")
+        {
+            global.__dae_object_on_stack[@ eDotDaeVertexWeights.VCountString] = _content;
+        }
+    break;
+    
+    case "input":
+        if (_context == "geometry")
+        {
+            var _parent = global.__dae_object_on_stack;
+            
+            var _object = __dotdae_object_new(_id, _tag, eDotDaeInput.__Size, undefined);
+            _object[@ eDotDaeInput.Semantic] = _map[? "semantic"];
+            _object[@ eDotDaeInput.Source  ] = _map[? "source"  ];
+            _object[@ eDotDaeInput.Offset  ] = _map[? "offset"  ];
+            
+            if (_parent[__DOTDAE_TYPE_INDEX] == "vertices")
+            {
+                var _parent_source_array = _parent[eDotDaeVertices.InputArray];
+                _parent_source_array[@ array_length_1d(_parent_source_array)] = _object;
+            }
+            else if ((_parent[__DOTDAE_TYPE_INDEX] == "triangles") || (_parent[__DOTDAE_TYPE_INDEX] == "polylist"))
+            {
+                var _parent_source_array = _parent[eDotDaePolyList.InputArray];
+                _parent_source_array[@ array_length_1d(_parent_source_array)] = _object;
+            }
+        }
+        else if (_context == "controller")
+        {
+            //TODO - Actually use this data for something
+            var _parent = global.__dae_object_on_stack;
+            
+            var _object = __dotdae_object_new(_id, _tag, eDotDaeInput.__Size, undefined);
+            _object[@ eDotDaeInput.Semantic] = _map[? "semantic"];
+            _object[@ eDotDaeInput.Source  ] = _map[? "source"  ];
+            _object[@ eDotDaeInput.Offset  ] = _map[? "offset"  ];
+            
+            var _parent_source_array = _parent[eDotDaeVertexWeights.InputArray];
+            _parent_source_array[@ array_length_1d(_parent_source_array)] = _object;
+        }
+    break;
+    
+    #endregion
+    
+    case "init_from":
+        if (_context == "image")
+        {
+            global.__dae_object_on_stack[@ eDotDaeImage.RelativePath] = _content;
         }
         else if (_context == "effect")
         {
@@ -133,7 +260,7 @@ switch(_tag)
     case "index_of_refraction": _context = "index_of_refraction"; break;
     
     case "color":
-        var _colour_array = __dotdae_string_decompose_array(_content);
+        var _colour_array = __dotdae_string_decompose_array(_content, true);
         var _rgba = (255*_colour_array[3])<<24 + (255*_colour_array[2])<<16 + (255*_colour_array[1])<<8 + (255*_colour_array[0]);
         
         switch(_context)
@@ -230,12 +357,6 @@ switch(_tag)
         _parent_mesh_array[@ array_length_1d(_parent_mesh_array)] = _object;
     break;
     
-    case "float_array":
-        var _object = __dotdae_object_new(_id, _tag, eDotDaeFloatArray.__Size, undefined);
-        _object[@ eDotDaeFloatArray.List] = __dotdae_string_decompose_list(_content);
-        global.__dae_object_on_stack[@ eDotDaeSource.FloatArray] = _object;
-    break;
-    
     case "accessor":
         //We don't care about the accessor definition
     break;
@@ -251,33 +372,11 @@ switch(_tag)
         var _vbuff_array = _parent[eDotDaeMesh.VertexBufferArray];
         
         var _object = __dotdae_object_new_push(_parent[__DOTDAE_NAME_INDEX], _tag, eDotDaePolyList.__Size, global.__dae_vertex_buffers_list);
+        _object[@ eDotDaePolyList.Count     ] = real(_map[? "count"]);
         _object[@ eDotDaePolyList.Material  ] = _map[? "material"];
         _object[@ eDotDaePolyList.InputArray] = [];
         
         _vbuff_array[@ array_length_1d(_vbuff_array)] = _object;
-    break;
-    
-    case "input":
-        if (_context == "geometry")
-        {
-            var _parent = global.__dae_object_on_stack;
-            
-            var _object = __dotdae_object_new(_id, _tag, eDotDaeInput.__Size, undefined);
-            _object[@ eDotDaeInput.Semantic] = _map[? "semantic"];
-            _object[@ eDotDaeInput.Source  ] = _map[? "source"  ];
-            _object[@ eDotDaeInput.Offset  ] = _map[? "offset"  ];
-            
-            if (_parent[__DOTDAE_TYPE_INDEX] == "vertices")
-            {
-                var _parent_source_array = _parent[eDotDaeVertices.InputArray];
-                _parent_source_array[@ array_length_1d(_parent_source_array)] = _object;
-            }
-            else if ((_parent[__DOTDAE_TYPE_INDEX] == "triangles") || (_parent[__DOTDAE_TYPE_INDEX] == "polylist"))
-            {
-                var _parent_source_array = _parent[eDotDaePolyList.InputArray];
-                _parent_source_array[@ array_length_1d(_parent_source_array)] = _object;
-            }
-        }
     break;
     
     case "p":

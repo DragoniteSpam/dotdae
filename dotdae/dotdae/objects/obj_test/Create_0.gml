@@ -7,7 +7,7 @@ dotdae_image_add(tex_lion, "sponza/lion.png");
 
 //Load our .dae from disk. This might take a while!
 //The script returns a dotdae model (in reality, an array) that we can draw in the Draw event
-container = dotdae_model_load_file("sponza.dae", true, false);
+container = dotdae_model_load_file("Drachen.dae", true, false);
 
 //Mouse lock variables (press F3 to lock the mouse and use mouselook)
 mouse_lock = false;
