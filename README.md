@@ -1,3 +1,3 @@
-<h1 align="center">dotdae 0.0.0</h1>
+<h1 align="center">dotdae 1.0.0</h1>
 
 ### @jujuadams
