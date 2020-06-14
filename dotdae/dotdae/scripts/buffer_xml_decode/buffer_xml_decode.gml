@@ -1,8 +1,13 @@
-/// Decodes an XML string stored in a buffer and outputs a JSON equivalent
+/// Decodes an XML string stored in a buffer and outputs a sorta-JSON equivalent
+///
+/// This script was written for the dotdae library, but it's usable in lots of other contexts too
 ///
 /// @param buffer
 /// @param offset
 /// @param size
+///
+/// @jujuadams
+/// 2020-06-14
 
 var _buffer = argument0;
 var _offset = argument1;

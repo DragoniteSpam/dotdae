@@ -46,7 +46,7 @@ global.__dae_vertex_buffers_list = _dae_vertex_buffers_list;
 
 //Parse the .dae XML found in the buffer
 if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Parsing XML... (This may take some time)");
-var _xml = dotdae_xml_buffer_decode(_buffer, 0, buffer_get_size(_buffer));
+var _xml = buffer_xml_decode(_buffer, 0, buffer_get_size(_buffer));
 if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("...finished parsing XML");
 
 //Traverse the generated XML and build a data structure we can use
