@@ -10,7 +10,7 @@ var _content        = _map[? "-content" ];
 var _id             = _map[? "id"       ];
 var _parse_children = true;
 var _return         = undefined;
-var _stack_size     = ds_list_size(global.__dae_object_stack);
+var _stack_size     = ds_list_size(global.__dae_stack);
 
 switch(_tag)
 {
@@ -89,7 +89,7 @@ switch(_tag)
     case "init_from":
         if (_context == "image")
         {
-            global.__dae_object[@ eDotDaeImage.RelativePath] = _content;
+            global.__dae_object_on_stack[@ eDotDaeImage.RelativePath] = _content;
         }
         else if (_context == "effect")
         {
@@ -100,7 +100,7 @@ switch(_tag)
     case "source":
         if (_context == "geometry")
         {
-            var _parent = global.__dae_object;
+            var _parent = global.__dae_object_on_stack;
             var _object = __dotdae_object_new_push(_id, _tag, eDotDaeSource.__Size, undefined);
             
             var _parent_source_array = _parent[eDotDaeMesh.SourceArray];
@@ -122,7 +122,7 @@ switch(_tag)
     break;
     
     case "phong":
-        global.__dae_object[@ eDotDaeEffect.Technique] = "phong";
+        global.__dae_object_on_stack[@ eDotDaeEffect.Technique] = "phong";
     break;
     
     case "emission":            _context = "emission";            break;
@@ -138,12 +138,12 @@ switch(_tag)
         
         switch(_context)
         {
-            case "emission":            global.__dae_object[@ eDotDaeEffect.Emission  ] = _rgba; break;
-            case "ambient":             global.__dae_object[@ eDotDaeEffect.Ambient   ] = _rgba; break;
-            case "diffuse":             global.__dae_object[@ eDotDaeEffect.Diffuse   ] = _rgba; break;
-            case "specular":            global.__dae_object[@ eDotDaeEffect.Specular  ] = _rgba; break;
-            case "shininess":           global.__dae_object[@ eDotDaeEffect.Shininess ] = _rgba; break;
-            case "index_of_refraction": global.__dae_object[@ eDotDaeEffect.Refraction] = _rgba; break;
+            case "emission":            global.__dae_object_on_stack[@ eDotDaeEffect.Emission  ] = _rgba; break;
+            case "ambient":             global.__dae_object_on_stack[@ eDotDaeEffect.Ambient   ] = _rgba; break;
+            case "diffuse":             global.__dae_object_on_stack[@ eDotDaeEffect.Diffuse   ] = _rgba; break;
+            case "specular":            global.__dae_object_on_stack[@ eDotDaeEffect.Specular  ] = _rgba; break;
+            case "shininess":           global.__dae_object_on_stack[@ eDotDaeEffect.Shininess ] = _rgba; break;
+            case "index_of_refraction": global.__dae_object_on_stack[@ eDotDaeEffect.Refraction] = _rgba; break;
         }
     break;
     
@@ -152,23 +152,23 @@ switch(_tag)
         var _texcoord_name = _map[? "texcoord"]; //Not used at the moment
         switch(_context)
         {
-            case "emission":  global.__dae_object[@ eDotDaeEffect.EmissionImageName ] = _texture_name; break;
-            case "ambient":   global.__dae_object[@ eDotDaeEffect.AmbientImageName  ] = _texture_name; break;
-            case "diffuse":   global.__dae_object[@ eDotDaeEffect.DiffuseImageName  ] = _texture_name; break;
-            case "specular":  global.__dae_object[@ eDotDaeEffect.SpecularImageName ] = _texture_name; break;
-            case "shininess": global.__dae_object[@ eDotDaeEffect.ShininessImageName] = _texture_name; break;
+            case "emission":  global.__dae_object_on_stack[@ eDotDaeEffect.EmissionImageName ] = _texture_name; break;
+            case "ambient":   global.__dae_object_on_stack[@ eDotDaeEffect.AmbientImageName  ] = _texture_name; break;
+            case "diffuse":   global.__dae_object_on_stack[@ eDotDaeEffect.DiffuseImageName  ] = _texture_name; break;
+            case "specular":  global.__dae_object_on_stack[@ eDotDaeEffect.SpecularImageName ] = _texture_name; break;
+            case "shininess": global.__dae_object_on_stack[@ eDotDaeEffect.ShininessImageName] = _texture_name; break;
         }
     break;
     
     case "float":
         switch(_context)
         {
-            case "emission":            global.__dae_object[@ eDotDaeEffect.Emission  ] = real(_content); break;
-            case "ambient":             global.__dae_object[@ eDotDaeEffect.Ambient   ] = real(_content); break;
-            case "diffuse":             global.__dae_object[@ eDotDaeEffect.Diffuse   ] = real(_content); break;
-            case "specular":            global.__dae_object[@ eDotDaeEffect.Specular  ] = real(_content); break;
-            case "shininess":           global.__dae_object[@ eDotDaeEffect.Shininess ] = real(_content); break;
-            case "index_of_refraction": global.__dae_object[@ eDotDaeEffect.Refraction] = real(_content); break;
+            case "emission":            global.__dae_object_on_stack[@ eDotDaeEffect.Emission  ] = real(_content); break;
+            case "ambient":             global.__dae_object_on_stack[@ eDotDaeEffect.Ambient   ] = real(_content); break;
+            case "diffuse":             global.__dae_object_on_stack[@ eDotDaeEffect.Diffuse   ] = real(_content); break;
+            case "specular":            global.__dae_object_on_stack[@ eDotDaeEffect.Specular  ] = real(_content); break;
+            case "shininess":           global.__dae_object_on_stack[@ eDotDaeEffect.Shininess ] = real(_content); break;
+            case "index_of_refraction": global.__dae_object_on_stack[@ eDotDaeEffect.Refraction] = real(_content); break;
         }
     break;
     
@@ -178,7 +178,7 @@ switch(_tag)
         _object[@ eDotDaeParameter.Name] = _sid;
         _object[@ eDotDaeParameter.Type] = _tag;
         
-        var _parameter_map = global.__dae_object[eDotDaeEffect.Parameters];
+        var _parameter_map = global.__dae_object_on_stack[eDotDaeEffect.Parameters];
         _parameter_map[? _sid] = _object;
         
         global.__dae_parameter = _object;
@@ -203,9 +203,9 @@ switch(_tag)
         if (string_char_at(_url, 1) == "#") _url = string_delete(_url, 1, 1);
         
         //TODO - Error handling for when the effect can't be found
-        global.__dae_object[@ eDotDaeMaterial.InstanceOf] = global.__dae_object_map[? _url];
+        global.__dae_object_on_stack[@ eDotDaeMaterial.InstanceOf] = global.__dae_object_map[? _url];
         
-        if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Material \"", global.__dae_object[eDotDaeMaterial.Name], "\" added, instance of effect \"", _url, "\"");
+        if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Material \"", global.__dae_object_on_stack[eDotDaeMaterial.Name], "\" added, instance of effect \"", _url, "\"");
     break;
     
     #endregion
@@ -220,7 +220,7 @@ switch(_tag)
     break;
     
     case "mesh":
-        var _parent = global.__dae_object;
+        var _parent = global.__dae_object_on_stack;
         
         var _object = __dotdae_object_new_push(_parent[__DOTDAE_NAME_INDEX], _tag, eDotDaeMesh.__Size, undefined);
         _object[@ eDotDaeMesh.SourceArray      ] = [];
@@ -233,7 +233,7 @@ switch(_tag)
     case "float_array":
         var _object = __dotdae_object_new(_id, _tag, eDotDaeFloatArray.__Size, undefined);
         _object[@ eDotDaeFloatArray.List] = __dotdae_string_decompose_list(_content);
-        global.__dae_object[@ eDotDaeSource.FloatArray] = _object;
+        global.__dae_object_on_stack[@ eDotDaeSource.FloatArray] = _object;
     break;
     
     case "accessor":
@@ -247,7 +247,7 @@ switch(_tag)
     
     case "triangles":
     case "polylist":
-        var _parent = global.__dae_object;
+        var _parent = global.__dae_object_on_stack;
         var _vbuff_array = _parent[eDotDaeMesh.VertexBufferArray];
         
         var _object = __dotdae_object_new_push(_parent[__DOTDAE_NAME_INDEX], _tag, eDotDaePolyList.__Size, global.__dae_vertex_buffers_list);
@@ -260,7 +260,7 @@ switch(_tag)
     case "input":
         if (_context == "geometry")
         {
-            var _parent = global.__dae_object;
+            var _parent = global.__dae_object_on_stack;
             
             var _object = __dotdae_object_new(_id, _tag, eDotDaeInput.__Size, undefined);
             _object[@ eDotDaeInput.Semantic] = _map[? "semantic"];
@@ -281,7 +281,7 @@ switch(_tag)
     break;
     
     case "p":
-        global.__dae_object[@ eDotDaePolyList.PString] = _content;
+        global.__dae_object_on_stack[@ eDotDaePolyList.PString] = _content;
     break;
     
     #endregion
@@ -298,10 +298,10 @@ if (_parse_children && (_children != undefined))
 }
 
 //If the stack size has changed, pop the object we pushed!
-if (_stack_size != ds_list_size(global.__dae_object_stack))
+if (_stack_size != ds_list_size(global.__dae_stack))
 {
-    ds_list_delete(global.__dae_object_stack, ds_list_size(global.__dae_object_stack)-1);
-    global.__dae_object = global.__dae_object_stack[| ds_list_size(global.__dae_object_stack)-1];
+    ds_list_delete(global.__dae_stack, ds_list_size(global.__dae_stack)-1);
+    global.__dae_object_on_stack = global.__dae_stack[| ds_list_size(global.__dae_stack)-1];
 }
 
 return _return;

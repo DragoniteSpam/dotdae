@@ -36,7 +36,7 @@ _container[@ eDotDae.GeometryList    ] = _dae_geometries_list;
 _container[@ eDotDae.VertexBufferList] = _dae_vertex_buffers_list;
 
 //Define some global variables that'll get referenced in __dotdae_model_load_inner()
-global.__dae_object_stack        = ds_list_create();
+global.__dae_stack               = ds_list_create();
 global.__dae_object_map          = _dae_object_map;
 global.__dae_effects_list        = _dae_effects_list;
 global.__dae_materials_list      = _dae_materials_list;
@@ -480,9 +480,10 @@ if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("...finished building vertex buffers");
 #endregion
 
 //Clean up
-ds_list_destroy(global.__dae_object_stack);
-global.__dae_object_stack        = undefined;
+ds_list_destroy(global.__dae_stack);
+global.__dae_stack               = undefined;
 global.__dae_object_map          = undefined;
+global.__dae_object_on_stack     = undefined;
 global.__dae_effects_list        = undefined;
 global.__dae_materials_list      = undefined;
 global.__dae_images_list         = undefined;
