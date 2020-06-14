@@ -1,3 +1,7 @@
 <h1 align="center">dotdae 1.0.0</h1>
 
-### @jujuadams
+<p align="center">Collada/.dae loader, written in native GML, for GameMaker Studio 2 </p>
+
+<p align="center"><b>@jujuadams</b></p>
+
+Very much a work in progress. Please don't use for production code.
