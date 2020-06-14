@@ -25,17 +25,6 @@ var _vformat           = argument1;
 var _flip_texcoords    = argument2;
 var _reverse_triangles = argument3;
 
-enum eDotDae
-{
-    ObjectMap,
-    EffectList,
-    MaterialList,
-    ImageList,
-    GeometryList,
-    VertexBufferList,
-    __Size
-}
-
 var _dae_object_map          = ds_map_create();
 var _dae_effects_list        = ds_list_create();
 var _dae_materials_list      = ds_list_create();
@@ -44,6 +33,8 @@ var _dae_geometries_list     = ds_list_create();
 var _dae_vertex_buffers_list = ds_list_create();
 
 var _container = array_create(eDotDae.__Size, undefined);
+_container[@ eDotDae.Name            ] = "<unnamed>";
+_container[@ eDotDae.Type            ] = "containter"
 _container[@ eDotDae.ObjectMap       ] = _dae_object_map;
 _container[@ eDotDae.EffectList      ] = _dae_effects_list;
 _container[@ eDotDae.MaterialList    ] = _dae_materials_list;

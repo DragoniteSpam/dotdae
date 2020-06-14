@@ -34,16 +34,6 @@ switch(_tag)
     #region Images
     
     case "image":
-        enum eDotDaeImage
-        {
-            Name, //Must be the same as __DOTDAE_NAME_INDEX
-            Type, //Must be the same as __DOTDAE_TYPE_INDEX
-            RelativePath,
-            Sprite,
-            Texture,
-            __Size
-        }
-        
         var _object = __dotdae_object_new_push(_id, _tag, eDotDaeImage.__Size, global.__dae_images_list);
         
         var _i = 0;
@@ -97,14 +87,6 @@ switch(_tag)
     break;
     
     case "source":
-        enum eDotDaeSource
-        {
-            Name, //Must be the same as __DOTDAE_NAME_INDEX
-            Type, //Must be the same as __DOTDAE_TYPE_INDEX
-            FloatArray,
-            __Size
-        }
-        
         if (_context == "geometry")
         {
             var _parent = global.__dae_object;
@@ -122,39 +104,6 @@ switch(_tag)
     #region Effect
     
     case "effect":
-        enum eDotDaeEffect
-        {
-            Name, //Must be the same as __DOTDAE_NAME_INDEX
-            Type, //Must be the same as __DOTDAE_TYPE_INDEX
-            
-            Parameters,
-            Technique,
-            
-            Emission,
-            EmissionImageName,
-            EmissionTexture,
-            
-            Ambient,
-            AmbientImageName,
-            AmbientTexture,
-            
-            Diffuse,
-            DiffuseImageName,
-            DiffuseTexture,
-            
-            Specular,
-            SpecularImageName,
-            SpecularTexture,
-            
-            Shininess,
-            ShininessImageName,
-            ShininessTexture,
-            
-            Refraction,
-            
-            __Size
-        }
-        
         var _object = __dotdae_object_new_push(_id, _tag, eDotDaeEffect.__Size, global.__dae_effects_list);
         _object[@ eDotDaeEffect.Parameters] = ds_map_create();
         
@@ -213,15 +162,6 @@ switch(_tag)
     break;
     
     case "newparam":
-        enum eDotDaeParameter
-        {
-            Name, //Must be the same as __DOTDAE_NAME_INDEX
-            Type, //Must be the same as __DOTDAE_TYPE_INDEX
-            ParameterType,
-            Value,
-            __Size
-        }
-        
         var _sid = _map[? "sid"];
         var _object = array_create(eDotDaeParameter.__Size, undefined);
         _object[@ eDotDaeParameter.Name] = _sid;
@@ -243,15 +183,6 @@ switch(_tag)
     #region Material
     
     case "material":
-        enum eDotDaeMaterial
-        {
-            Name, //Must be the same as __DOTDAE_NAME_INDEX
-            Type, //Must be the same as __DOTDAE_TYPE_INDEX
-            DisplayName,
-            InstanceOf,
-            __Size
-        }
-        
         var _object = __dotdae_object_new_push(_id, _tag, eDotDaeMaterial.__Size, global.__dae_materials_list);
         _object[@ eDotDaeMaterial.DisplayName] = _map[? "name"];
     break;
@@ -271,14 +202,6 @@ switch(_tag)
     #region Geometry
     
     case "geometry":
-        enum eDotDaeGeometry
-        {
-            Name, //Must be the same as __DOTDAE_NAME_INDEX
-            Type, //Must be the same as __DOTDAE_TYPE_INDEX
-            MeshArray,
-            __Size
-        }
-        
         var _object = __dotdae_object_new_push(_id, _tag, eDotDaeGeometry.__Size, global.__dae_geometries_list);
         _object[@ eDotDaeGeometry.MeshArray] = [];
         
@@ -286,15 +209,6 @@ switch(_tag)
     break;
     
     case "mesh":
-        enum eDotDaeMesh
-        {
-            Name, //Must be the same as __DOTDAE_NAME_INDEX
-            Type, //Must be the same as __DOTDAE_TYPE_INDEX
-            SourceArray,
-            VertexBufferArray,
-            __Size
-        }
-        
         var _parent = global.__dae_object;
         
         var _object = __dotdae_object_new_push(_parent[__DOTDAE_NAME_INDEX], _tag, eDotDaeMesh.__Size, undefined);
@@ -306,14 +220,6 @@ switch(_tag)
     break;
     
     case "float_array":
-        enum eDotDaeFloatArray
-        {
-            Name, //Must be the same as __DOTDAE_NAME_INDEX
-            Type, //Must be the same as __DOTDAE_TYPE_INDEX
-            List,
-            __Size
-        }
-        
         var _object = __dotdae_object_new(_id, _tag, eDotDaeFloatArray.__Size, undefined);
         _object[@ eDotDaeFloatArray.List] = __dotdae_string_decompose_list(_content);
         global.__dae_object[@ eDotDaeSource.FloatArray] = _object;
@@ -324,33 +230,12 @@ switch(_tag)
     break;
     
     case "vertices":
-        enum eDotDaeVertices
-        {
-            Name, //Must be the same as __DOTDAE_NAME_INDEX
-            Type, //Must be the same as __DOTDAE_TYPE_INDEX
-            InputArray,
-            __Size
-        }
-        
         var _object = __dotdae_object_new_push(_id, _tag, eDotDaeVertices.__Size, undefined);
         _object[@ eDotDaeVertices.InputArray] = [];
     break;
     
     case "triangles":
     case "polylist":
-        enum eDotDaeVertexBuffer
-        {
-            Name, //Must be the same as __DOTDAE_NAME_INDEX
-            Type, //Must be the same as __DOTDAE_TYPE_INDEX
-            Material,
-            Effect,
-            InputArray,
-            VertexBuffer,
-            PString,
-            FormatCode,
-            __Size
-        }
-        
         var _parent = global.__dae_object;
         var _vbuff_array = _parent[eDotDaeMesh.VertexBufferArray];
         
@@ -362,16 +247,6 @@ switch(_tag)
     break;
     
     case "input":
-        enum eDotDaeInput
-        {
-            Name, //Must be the same as __DOTDAE_NAME_INDEX
-            Type, //Must be the same as __DOTDAE_TYPE_INDEX
-            Semantic,
-            Source,
-            Offset,
-            __Size
-        }
-        
         if (_context == "geometry")
         {
             var _parent = global.__dae_object;
