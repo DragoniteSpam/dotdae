@@ -44,7 +44,7 @@ switch(_tag)
             __Size
         }
         
-        var _object = dotdae_object_new_push(_id, _tag, eDotDaeImage.__Size, global.__dae_images_list);
+        var _object = __dotdae_object_new_push(_id, _tag, eDotDaeImage.__Size, global.__dae_images_list);
         
         var _i = 0;
         repeat(ds_list_size(_children))
@@ -108,7 +108,7 @@ switch(_tag)
         if (_context == "geometry")
         {
             var _parent = global.__dae_object;
-            var _object = dotdae_object_new_push(_id, _tag, eDotDaeSource.__Size, undefined);
+            var _object = __dotdae_object_new_push(_id, _tag, eDotDaeSource.__Size, undefined);
             
             var _parent_source_array = _parent[eDotDaeMesh.SourceArray];
             _parent_source_array[@ array_length_1d(_parent_source_array)] = _object;
@@ -155,7 +155,7 @@ switch(_tag)
             __Size
         }
         
-        var _object = dotdae_object_new_push(_id, _tag, eDotDaeEffect.__Size, global.__dae_effects_list);
+        var _object = __dotdae_object_new_push(_id, _tag, eDotDaeEffect.__Size, global.__dae_effects_list);
         _object[@ eDotDaeEffect.Parameters] = ds_map_create();
         
         if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Adding effect \"", _id, "\"");
@@ -173,7 +173,7 @@ switch(_tag)
     case "index_of_refraction": _context = "index_of_refraction"; break;
     
     case "color":
-        var _colour_array = dotdae_string_decompose_array(_content);
+        var _colour_array = __dotdae_string_decompose_array(_content);
         var _rgba = (255*_colour_array[3])<<24 + (255*_colour_array[2])<<16 + (255*_colour_array[1])<<8 + (255*_colour_array[0]);
         
         switch(_context)
@@ -252,7 +252,7 @@ switch(_tag)
             __Size
         }
         
-        var _object = dotdae_object_new_push(_id, _tag, eDotDaeMaterial.__Size, global.__dae_materials_list);
+        var _object = __dotdae_object_new_push(_id, _tag, eDotDaeMaterial.__Size, global.__dae_materials_list);
         _object[@ eDotDaeMaterial.DisplayName] = _map[? "name"];
     break;
     
@@ -279,7 +279,7 @@ switch(_tag)
             __Size
         }
         
-        var _object = dotdae_object_new_push(_id, _tag, eDotDaeGeometry.__Size, global.__dae_geometries_list);
+        var _object = __dotdae_object_new_push(_id, _tag, eDotDaeGeometry.__Size, global.__dae_geometries_list);
         _object[@ eDotDaeGeometry.MeshArray] = [];
         
         if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Geometry \"", _id, "\" added");
@@ -297,7 +297,7 @@ switch(_tag)
         
         var _parent = global.__dae_object;
         
-        var _object = dotdae_object_new_push(_parent[__DOTDAE_NAME_INDEX], _tag, eDotDaeMesh.__Size, undefined);
+        var _object = __dotdae_object_new_push(_parent[__DOTDAE_NAME_INDEX], _tag, eDotDaeMesh.__Size, undefined);
         _object[@ eDotDaeMesh.SourceArray      ] = [];
         _object[@ eDotDaeMesh.VertexBufferArray] = [];
         
@@ -314,8 +314,8 @@ switch(_tag)
             __Size
         }
         
-        var _object = dotdae_object_new(_id, _tag, eDotDaeFloatArray.__Size, undefined);
-        _object[@ eDotDaeFloatArray.List] = dotdae_string_decompose_list(_content);
+        var _object = __dotdae_object_new(_id, _tag, eDotDaeFloatArray.__Size, undefined);
+        _object[@ eDotDaeFloatArray.List] = __dotdae_string_decompose_list(_content);
         global.__dae_object[@ eDotDaeSource.FloatArray] = _object;
     break;
     
@@ -332,7 +332,7 @@ switch(_tag)
             __Size
         }
         
-        var _object = dotdae_object_new_push(_id, _tag, eDotDaeVertices.__Size, undefined);
+        var _object = __dotdae_object_new_push(_id, _tag, eDotDaeVertices.__Size, undefined);
         _object[@ eDotDaeVertices.InputArray] = [];
     break;
     
@@ -354,7 +354,7 @@ switch(_tag)
         var _parent = global.__dae_object;
         var _vbuff_array = _parent[eDotDaeMesh.VertexBufferArray];
         
-        var _object = dotdae_object_new_push(_parent[__DOTDAE_NAME_INDEX], _tag, eDotDaeVertexBuffer.__Size, global.__dae_vertex_buffers_list);
+        var _object = __dotdae_object_new_push(_parent[__DOTDAE_NAME_INDEX], _tag, eDotDaeVertexBuffer.__Size, global.__dae_vertex_buffers_list);
         _object[@ eDotDaeVertexBuffer.Material  ] = _map[? "material"];
         _object[@ eDotDaeVertexBuffer.InputArray] = [];
         
@@ -376,7 +376,7 @@ switch(_tag)
         {
             var _parent = global.__dae_object;
             
-            var _object = dotdae_object_new(_id, _tag, eDotDaeInput.__Size, undefined);
+            var _object = __dotdae_object_new(_id, _tag, eDotDaeInput.__Size, undefined);
             _object[@ eDotDaeInput.Semantic] = _map[? "semantic"];
             _object[@ eDotDaeInput.Source  ] = _map[? "source"  ];
             _object[@ eDotDaeInput.Offset  ] = _map[? "offset"  ];
@@ -412,6 +412,10 @@ if (_parse_children && (_children != undefined))
 }
 
 //If the stack size has changed, pop the object we pushed!
-if (_stack_size != ds_list_size(global.__dae_object_stack)) dotdae_object_pop();
+if (_stack_size != ds_list_size(global.__dae_object_stack))
+{
+    ds_list_delete(global.__dae_object_stack, ds_list_size(global.__dae_object_stack)-1);
+    global.__dae_object = global.__dae_object_stack[| ds_list_size(global.__dae_object_stack)-1];
+}
 
 return _return;

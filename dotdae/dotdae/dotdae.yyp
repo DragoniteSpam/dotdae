@@ -122,7 +122,7 @@
             "Key": "22552809-442c-44bc-b884-5538dd16fc52",
             "Value": {
                 "id": "154f765b-e8af-42be-8843-13002f79f9d9",
-                "resourcePath": "scripts\\dotdae_object_new_push\\dotdae_object_new_push.yy",
+                "resourcePath": "scripts\\__dotdae_object_new_push\\__dotdae_object_new_push.yy",
                 "resourceType": "GMScript"
             }
         },
@@ -207,14 +207,6 @@
             }
         },
         {
-            "Key": "34c871fa-a14f-4683-a099-1cf635d36e3f",
-            "Value": {
-                "id": "3bc9f2ab-bdad-4bb6-8798-84d77d039fa8",
-                "resourcePath": "scripts\\dotdae_object_push\\dotdae_object_push.yy",
-                "resourceType": "GMScript"
-            }
-        },
-        {
             "Key": "374e3d8a-fab7-4d2f-91e5-37ef291d24a8",
             "Value": {
                 "id": "619cc611-dddd-4cd9-9d7d-63681599999d",
@@ -258,7 +250,7 @@
             "Key": "3de87189-979f-4cce-a3b2-96e2fe18249f",
             "Value": {
                 "id": "1a095a5f-fbba-4321-9e4b-27a7cc8480ea",
-                "resourcePath": "scripts\\dotdae_string_decompose_array\\dotdae_string_decompose_array.yy",
+                "resourcePath": "scripts\\__dotdae_string_decompose_array\\__dotdae_string_decompose_array.yy",
                 "resourceType": "GMScript"
             }
         },
@@ -647,14 +639,6 @@
             }
         },
         {
-            "Key": "9eca22be-b27a-4b81-8764-0e905273eaee",
-            "Value": {
-                "id": "bb7e4a10-8334-4628-a302-b30d27e96e12",
-                "resourcePath": "scripts\\dotdae_ds_resolve_source\\dotdae_ds_resolve_source.yy",
-                "resourceType": "GMScript"
-            }
-        },
-        {
             "Key": "9fd12715-5459-4496-9bae-08d03e914351",
             "Value": {
                 "id": "87655978-e4ad-48f6-9088-93f45ef30372",
@@ -791,14 +775,6 @@
             }
         },
         {
-            "Key": "cb957fc6-0e70-4b22-af73-d73a581ac140",
-            "Value": {
-                "id": "dc8b2248-0169-4f10-9f62-4469ea74d7b4",
-                "resourcePath": "scripts\\dotdae_object_pop\\dotdae_object_pop.yy",
-                "resourceType": "GMScript"
-            }
-        },
-        {
             "Key": "cc98d028-7bdd-4680-85f3-c87a7baa481e",
             "Value": {
                 "id": "20f2c289-fbfa-45b9-88b0-ff9e7c5717f2",
@@ -882,7 +858,7 @@
             "Key": "e39ee9fa-d3e2-436e-8eb7-fcacba821108",
             "Value": {
                 "id": "1d7a802b-cf9a-4d71-8c8c-c7465a9287c1",
-                "resourcePath": "scripts\\dotdae_string_decompose_list\\dotdae_string_decompose_list.yy",
+                "resourcePath": "scripts\\__dotdae_string_decompose_list\\__dotdae_string_decompose_list.yy",
                 "resourceType": "GMScript"
             }
         },
@@ -922,7 +898,7 @@
             "Key": "f2ec6e98-6e2a-4e8d-97cb-8641cbf63325",
             "Value": {
                 "id": "9f411b4a-a2fb-45bc-a3bd-1301a96e7716",
-                "resourcePath": "scripts\\dotdae_object_new\\dotdae_object_new.yy",
+                "resourcePath": "scripts\\__dotdae_object_new\\__dotdae_object_new.yy",
                 "resourceType": "GMScript"
             }
         },
@@ -998,14 +974,11 @@
         "059e2c48-64fb-4581-bd90-6b515cb86387",
         "5e7e4b0a-17e6-4b33-be7a-3f7281a2e51b",
         "b2bb64bd-f8ca-4da3-be62-1fde1f57d7ef",
-        "9eca22be-b27a-4b81-8764-0e905273eaee",
         "32e19507-56cd-4b96-ac32-489c4194157e",
         "cb5448bb-6e37-445e-99bc-547c02677f25",
         "889e76ad-eb76-4da9-b55b-056a0ff034a0",
         "f2ec6e98-6e2a-4e8d-97cb-8641cbf63325",
         "22552809-442c-44bc-b884-5538dd16fc52",
-        "34c871fa-a14f-4683-a099-1cf635d36e3f",
-        "cb957fc6-0e70-4b22-af73-d73a581ac140",
         "3de87189-979f-4cce-a3b2-96e2fe18249f",
         "e39ee9fa-d3e2-436e-8eb7-fcacba821108"
     ],

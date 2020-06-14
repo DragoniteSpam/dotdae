@@ -51,6 +51,7 @@ _container[@ eDotDae.ImageList       ] = _dae_images_list;
 _container[@ eDotDae.GeometryList    ] = _dae_geometries_list;
 _container[@ eDotDae.VertexBufferList] = _dae_vertex_buffers_list;
 
+//Define some global variables that'll get referenced in __dotdae_model_load_inner()
 global.__dae_object_stack        = ds_list_create();
 global.__dae_object_map          = _dae_object_map;
 global.__dae_effects_list        = _dae_effects_list;
@@ -125,7 +126,7 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
     var _input_array = _object[eDotDaeVertexBuffer.InputArray]; //Get our array that describes the vertex buffer layout
     
     //Break down the string found in the <p> tag into a list of indexes
-    var _index_list  = dotdae_string_decompose_list(_pstring);
+    var _index_list  = __dotdae_string_decompose_list(_pstring);
     var _index_count = ds_list_size(_index_list);
     
     //Figure out how many vertices we have
@@ -149,17 +150,32 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
     repeat(_input_count)
     {
         var _input = _input_array[_i];
+        var _source_name = _input[eDotDaeInput.Source  ];
+        var _semantic    = _input[eDotDaeInput.Semantic];
         
-        //Find the *actual* source that we want to read (especially notable for handling the VERTEX -> POSITION weirdness)
-        var _source = dotdae_ds_resolve_source(_input[eDotDaeInput.Source]);
+        if (string_char_at(_source_name, 1) == "#") _source_name = string_delete(_source_name, 1, 1);
+        var _source = _dae_object_map[? _source_name];
+        
+        //Handle VERTEX -> POSITION weirdness
+        if (_source[__DOTDAE_TYPE_INDEX] == "vertices")
+        {
+            var _temp_input_array = _source[eDotDaeVertices.InputArray];
+            var _temp_input = _temp_input_array[0];
+            
+            _source_name = _temp_input[eDotDaeInput.Source  ];
+            _semantic    = _temp_input[eDotDaeInput.Semantic];
+            
+            if (string_char_at(_source_name, 1) == "#") _source_name = string_delete(_source_name, 1, 1);
+            _source = _dae_object_map[? _source_name];
+        }
+        
         var _source_array = _source[eDotDaeSource.FloatArray];
         
         var _collection_list = undefined;
-        switch(_input[eDotDaeInput.Semantic])
+        switch(_semantic)
         {
-            case "VERTEX":
             case "POSITION":
-                _collection_list = _position_index_list; //Set our sublist to be the position one
+                _collection_list = _position_index_list;                  //Set our sublist to be the position one
                 _position_source = _source_array[eDotDaeFloatArray.List]; //And set the source for position data too
             break;
             
@@ -208,6 +224,7 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
                      + DOTDAE_FORMAT_N*_enough_normals
                      + DOTDAE_FORMAT_C*_enough_colours
                      + DOTDAE_FORMAT_T*_enough_texcoords;
+    _object[@ eDotDaeVertexBuffer.FormatCode] = _format_code;
     
     //Now create our vertex buffer based on what format code we have
     //This seems like a long way round of doing things, but it ends up being more efficient
@@ -461,6 +478,16 @@ repeat(ds_list_size(_dae_vertex_buffers_list))
 if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("...finished building vertex buffers");
 
 #endregion
+
+//Clean up
+ds_list_destroy(global.__dae_object_stack);
+global.__dae_object_stack        = undefined;
+global.__dae_object_map          = undefined;
+global.__dae_effects_list        = undefined;
+global.__dae_materials_list      = undefined;
+global.__dae_images_list         = undefined;
+global.__dae_geometries_list     = undefined;
+global.__dae_vertex_buffers_list = undefined;
 
 //If we want to report the load time, do it!
 if (DOTDAE_OUTPUT_LOAD_TIME) show_debug_message("dotdae_load(): Total time to load was " + string((get_timer() - _timer)/1000) + "ms");

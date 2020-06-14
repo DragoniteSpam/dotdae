@@ -1,8 +1,8 @@
 {
-    "id": "9eca22be-b27a-4b81-8764-0e905273eaee",
+    "id": "22552809-442c-44bc-b884-5538dd16fc52",
     "modelName": "GMScript",
     "mvc": "1.0",
-    "name": "dotdae_ds_resolve_source",
+    "name": "__dotdae_object_new_push",
     "IsCompatibility": false,
     "IsDnD": false
 }
