@@ -11,7 +11,7 @@ dotdae_init();
 
 //Load our .dae from disk. This might take a while!
 //The script returns a dotdae model (in reality, an array) that we can draw in the Draw event
-model = dotdae_model_load_file("sponza.dae", vertex_format, true, false);
+container = dotdae_model_load_file("sponza.dae", vertex_format, true, false);
 
 //Mouse lock variables (press F3 to lock the mouse and use mouselook)
 mouse_lock = false;
@@ -19,7 +19,7 @@ mouse_lock_timer = 0;
 
 //Some variables to track the camera
 cam_x     = 0;
-cam_y     = 0;
+cam_y     = 10;
 cam_z     = 0;
 cam_yaw   = -60;
 cam_pitch = 0;

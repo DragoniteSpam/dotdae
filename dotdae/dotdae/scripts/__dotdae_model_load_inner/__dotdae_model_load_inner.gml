@@ -4,7 +4,6 @@
 var _map     = argument0;
 var _context = argument1;
 
-var _start_context  = _context;
 var _tag            = _map[? "-name"    ];
 var _children       = _map[? "-children"];
 var _content        = _map[? "-content" ];
@@ -50,7 +49,7 @@ switch(_tag)
         var _i = 0;
         repeat(ds_list_size(_children))
         {
-            dotdae_ds_parse(_children[| _i], _context);
+            __dotdae_model_load_inner(_children[| _i], _context);
             ++_i;
         }
         
@@ -68,13 +67,13 @@ switch(_tag)
                 _object[@ eDotDaeImage.Sprite ] = _existing_data[eDotDaeImage.Sprite ];
                 _object[@ eDotDaeImage.Texture] = _existing_data[eDotDaeImage.Texture];
                 
-                __dotdae_trace("\"", _id, "\" found as \"", _relative_path, "\", previously added as sprite ", _object[eDotDaeImage.Sprite], ", texture ", _object[eDotDaeImage.Texture]);
+                if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Image \"", _id, "\" from \"", _relative_path, "\" was previously added (sprite=", _object[eDotDaeImage.Sprite], ", texture=", _object[eDotDaeImage.Texture], ")");
             }
             else
             {
                 var _sprite  = sprite_add(_relative_path, 0, false, false, 0, 0);
                 var _texture = sprite_get_texture(_sprite, 0);
-                __dotdae_trace("\"", _id, "\" added as \"", _relative_path, "\" as sprite ", _sprite, ", texture ", _texture);
+                if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Image \"", _id, "\" added from \"", _relative_path, "\" (sprite=", _sprite, ", texture=", _texture, ")");
                 
                 
                 _object[@ eDotDaeImage.Sprite ] = _sprite;
@@ -127,24 +126,39 @@ switch(_tag)
         {
             Name, //Must be the same as __DOTDAE_NAME_INDEX
             Type, //Must be the same as __DOTDAE_TYPE_INDEX
+            
             Parameters,
             Technique,
+            
             Emission,
-            EmissionMap,
+            EmissionImageName,
+            EmissionTexture,
+            
             Ambient,
-            AmbientMap,
+            AmbientImageName,
+            AmbientTexture,
+            
             Diffuse,
-            DiffuseMap,
+            DiffuseImageName,
+            DiffuseTexture,
+            
             Specular,
-            SpecularMap,
+            SpecularImageName,
+            SpecularTexture,
+            
             Shininess,
-            ShininessMap,
+            ShininessImageName,
+            ShininessTexture,
+            
             Refraction,
+            
             __Size
         }
         
         var _object = dotdae_object_new_push(_id, _tag, eDotDaeEffect.__Size, global.__dae_effects_list);
         _object[@ eDotDaeEffect.Parameters] = ds_map_create();
+        
+        if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Adding effect \"", _id, "\"");
     break;
     
     case "phong":
@@ -174,15 +188,15 @@ switch(_tag)
     break;
     
     case "texture":
-        var _texture_binding  = _map[? "texture" ];
-        var _texcoord_binding = _map[? "texcoord"];
+        var _texture_name  = _map[? "texture" ];
+        var _texcoord_name = _map[? "texcoord"]; //Not used at the moment
         switch(_context)
         {
-            case "emission":  global.__dae_object[@ eDotDaeEffect.EmissionMap ] = _texture_binding; break;
-            case "ambient":   global.__dae_object[@ eDotDaeEffect.AmbientMap  ] = _texture_binding; break;
-            case "diffuse":   global.__dae_object[@ eDotDaeEffect.DiffuseMap  ] = _texture_binding; break;
-            case "specular":  global.__dae_object[@ eDotDaeEffect.SpecularMap ] = _texture_binding; break;
-            case "shininess": global.__dae_object[@ eDotDaeEffect.ShininessMap] = _texture_binding; break;
+            case "emission":  global.__dae_object[@ eDotDaeEffect.EmissionImageName ] = _texture_name; break;
+            case "ambient":   global.__dae_object[@ eDotDaeEffect.AmbientImageName  ] = _texture_name; break;
+            case "diffuse":   global.__dae_object[@ eDotDaeEffect.DiffuseImageName  ] = _texture_name; break;
+            case "specular":  global.__dae_object[@ eDotDaeEffect.SpecularImageName ] = _texture_name; break;
+            case "shininess": global.__dae_object[@ eDotDaeEffect.ShininessImageName] = _texture_name; break;
         }
     break;
     
@@ -243,7 +257,13 @@ switch(_tag)
     break;
     
     case "instance_effect":
-        global.__dae_object[@ eDotDaeMaterial.InstanceOf] = _map[? "url"];
+        var _url = _map[? "url"];
+        if (string_char_at(_url, 1) == "#") _url = string_delete(_url, 1, 1);
+        
+        //TODO - Error handling for when the effect can't be found
+        global.__dae_object[@ eDotDaeMaterial.InstanceOf] = global.__dae_object_map[? _url];
+        
+        if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Material \"", global.__dae_object[eDotDaeMaterial.Name], "\" added, instance of effect \"", _url, "\"");
     break;
     
     #endregion
@@ -261,6 +281,8 @@ switch(_tag)
         
         var _object = dotdae_object_new_push(_id, _tag, eDotDaeGeometry.__Size, global.__dae_geometries_list);
         _object[@ eDotDaeGeometry.MeshArray] = [];
+        
+        if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Geometry \"", _id, "\" added");
     break;
     
     case "mesh":
@@ -275,7 +297,7 @@ switch(_tag)
         
         var _parent = global.__dae_object;
         
-        var _object = dotdae_object_new_push(_id, _tag, eDotDaeMesh.__Size, undefined);
+        var _object = dotdae_object_new_push(_parent[__DOTDAE_NAME_INDEX], _tag, eDotDaeMesh.__Size, undefined);
         _object[@ eDotDaeMesh.SourceArray      ] = [];
         _object[@ eDotDaeMesh.VertexBufferArray] = [];
         
@@ -321,15 +343,18 @@ switch(_tag)
             Name, //Must be the same as __DOTDAE_NAME_INDEX
             Type, //Must be the same as __DOTDAE_TYPE_INDEX
             Material,
+            Effect,
             InputArray,
             VertexBuffer,
+            PString,
+            FormatCode,
             __Size
         }
         
         var _parent = global.__dae_object;
         var _vbuff_array = _parent[eDotDaeMesh.VertexBufferArray];
         
-        var _object = dotdae_object_new_push(_id, _tag, eDotDaeVertexBuffer.__Size, undefined);
+        var _object = dotdae_object_new_push(_parent[__DOTDAE_NAME_INDEX], _tag, eDotDaeVertexBuffer.__Size, global.__dae_vertex_buffers_list);
         _object[@ eDotDaeVertexBuffer.Material  ] = _map[? "material"];
         _object[@ eDotDaeVertexBuffer.InputArray] = [];
         
@@ -370,128 +395,7 @@ switch(_tag)
     break;
     
     case "p":
-        var _input_array = global.__dae_object[eDotDaeVertexBuffer.InputArray];
-        var _input_count = array_length_1d(_input_array);
-        
-        var _index_list  = dotdae_string_decompose_list(_content);
-        var _index_count = ds_list_size(_index_list);
-        
-        var _vertex_count = _index_count div _input_count;
-        
-        var _position_index_list = ds_list_create();
-        var _normal_index_list   = ds_list_create();
-        var _colour_index_list   = ds_list_create();
-        var _texcoord_index_list = ds_list_create();
-        
-        var _position_source = undefined;
-        var _normal_source   = undefined;
-        var _colour_source   = undefined;
-        var _texcoord_source = undefined;
-        
-        var _i = 0;
-        repeat(_input_count)
-        {
-            var _input = _input_array[_i];
-            
-            var _source = dotdae_ds_resolve_source(_input[eDotDaeInput.Source]);
-            var _source_array = _source[eDotDaeSource.FloatArray];
-            
-            var _collection_list = undefined;
-            switch(_input[eDotDaeInput.Semantic])
-            {
-                case "POSITION": _collection_list = _position_index_list; _position_source = _source_array[eDotDaeFloatArray.List]; break;
-                case "VERTEX":   _collection_list = _position_index_list; _position_source = _source_array[eDotDaeFloatArray.List]; break;
-                case "NORMAL":   _collection_list = _normal_index_list;   _normal_source   = _source_array[eDotDaeFloatArray.List]; break;
-                case "COLOR":    _collection_list = _colour_index_list;   _colour_source   = _source_array[eDotDaeFloatArray.List]; break;
-                case "TEXCOORD": _collection_list = _texcoord_index_list; _texcoord_source = _source_array[eDotDaeFloatArray.List]; break;
-            }
-            
-            var _j = real(_input[eDotDaeInput.Offset]);
-            var _k = 0;
-            repeat(_vertex_count)
-            {
-                ds_list_add(_collection_list, _index_list[| _j]);
-                _j += _input_count;
-                ++_k;
-            }
-            
-            ++_i;
-        }
-        
-        var _vbuff = vertex_create_buffer();
-        vertex_begin(_vbuff, global.__dae_vertex_format);
-        
-        var _i = 0;
-        var _r = 0;
-        repeat(_vertex_count)
-        {
-            var _j = _position_index_list[| _i];
-            if (_j != undefined)
-            {
-                _j *= 3;
-                vertex_position_3d(_vbuff, _position_source[| _j], _position_source[| _j+1], _position_source[| _j+2]);
-            }
-            else
-            {
-                vertex_position_3d(_vbuff, 0, 0, 0);
-            }
-            
-            var _j = _normal_index_list[| _i];
-            if (_j != undefined)
-            {
-                _j *= 3;
-                vertex_normal(_vbuff, _normal_source[| _j], _normal_source[| _j+1], _normal_source[| _j+2]);
-            }
-            else
-            {
-                vertex_normal(_vbuff, 0, 0, 0);
-            }
-            
-            var _j = _colour_index_list[| _i];
-            if (_j != undefined)
-            {
-                _j *= 3;
-                var _colour = make_colour_rgb(255*_colour_source[| _j], 255*_colour_source[| _j+1], 255*_colour_source[| _j+2]);
-                vertex_color(_vbuff, _colour, 1.0);
-            }
-            else
-            {
-                vertex_colour(_vbuff, c_white, 1.0);
-            }
-            
-            var _j = _texcoord_index_list[| _i];
-            if (_j != undefined)
-            {
-                _j *= 2;
-                if (global.__dae_flip_texcoords)
-                {
-                    vertex_texcoord(_vbuff, _texcoord_source[| _j], 1.0 - _texcoord_source[| _j+1]);
-                }
-                else
-                {
-                    vertex_texcoord(_vbuff, _texcoord_source[| _j], _texcoord_source[| _j+1]);
-                }
-            }
-            else
-            {
-                vertex_texcoord(_vbuff, 0, 0);
-            }
-            
-            if (global.__dae_reverse_triangles)
-            {
-                //Generate a 021 pattern
-                if (_r == 1) --_i else _i += 2;
-                ++_r;
-                if (_r >= 3) _r = 0;
-            }
-            else
-            {
-                ++_i;
-            }
-        }
-        
-        vertex_end(_vbuff);
-        global.__dae_object[@ eDotDaeVertexBuffer.VertexBuffer] = _vbuff;
+        global.__dae_object[@ eDotDaeVertexBuffer.PString] = _content;
     break;
     
     #endregion
@@ -502,14 +406,9 @@ if (_parse_children && (_children != undefined))
     var _i = 0;
     repeat(ds_list_size(_children))
     {
-        dotdae_ds_parse(_children[| _i], _context);
+        __dotdae_model_load_inner(_children[| _i], _context);
         ++_i;
     }
-}
-
-if (_tag == "effect")
-{
-    __dotdae_trace("effect: ", global.__dae_object);
 }
 
 //If the stack size has changed, pop the object we pushed!

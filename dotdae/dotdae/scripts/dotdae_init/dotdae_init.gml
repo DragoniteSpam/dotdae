@@ -1,5 +1,12 @@
 global.dae_image_library = ds_map_create();
 
+#macro DOTDAE_FORMAT_P    1
+#macro DOTDAE_FORMAT_N    2
+#macro DOTDAE_FORMAT_C    4
+#macro DOTDAE_FORMAT_T    8
+#macro DOTDAE_FORMAT_J   16
+#macro DOTDAE_FORMAT_W   32
+
 #region Internal macros
 
 //Always date your work!

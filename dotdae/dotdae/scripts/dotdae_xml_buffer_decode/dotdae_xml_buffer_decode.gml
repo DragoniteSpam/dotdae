@@ -4,8 +4,6 @@
 /// @param offset
 /// @param size
 
-if (DOTDAE_OUTPUT_LOAD_TIME) var _timer = get_timer();
-
 var _buffer = argument0;
 var _offset = argument1;
 var _size   = argument2;
@@ -253,8 +251,5 @@ repeat(_size)
 
 ds_list_destroy(_stack);
 buffer_seek(_buffer, buffer_seek_start, _old_tell);
-
-//If we want to report the load time, do it!
-if (DOTDAE_OUTPUT_LOAD_TIME) show_debug_message("dotdae_xml_buffer_decode(): Time to parse XML was " + string((get_timer() - _timer)/1000) + "ms");
 
 return _root
