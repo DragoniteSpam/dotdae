@@ -3,7 +3,7 @@ gpu_set_ztestenable(true);
 gpu_set_zwriteenable(true);
 
 //Clockwise faces are backfaces. We want to cull these so we're drawing less
-gpu_set_cullmode(cull_counterclockwise);
+gpu_set_cullmode(cull_clockwise);
 
 //Interpolation is set <on> in Windows graphics options so this code isn't needed
 //gpu_set_tex_filter(true);
@@ -28,7 +28,7 @@ matrix_set(matrix_view, matrix_build_lookat(cam_x, cam_y, cam_z,
 matrix_set(matrix_projection, matrix_build_projection_perspective_fov(90, room_width/room_height, 1, 6000));
 
 //Finally, draw the container
-matrix_set(matrix_world, matrix_build(0,0,0,   0,90,90,   4,4,4));
+//matrix_set(matrix_world, matrix_build(0,0,0,   0,90,90,   4,4,4));
 shader_set(shd_simple_lighting);
 dotdae_model_draw(container);
 shader_reset();

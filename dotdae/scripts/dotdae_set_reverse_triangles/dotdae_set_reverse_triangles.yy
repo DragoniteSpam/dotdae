@@ -2,11 +2,11 @@
   "isDnD": false,
   "isCompatibility": false,
   "parent": {
-    "name": "System",
-    "path": "folders/dotdae/System.yy",
+    "name": "dotdae",
+    "path": "folders/dotdae.yy",
   },
   "resourceVersion": "1.0",
-  "name": "__dotdae_trace",
+  "name": "dotdae_set_reverse_triangles",
   "tags": [],
   "resourceType": "GMScript",
 }
