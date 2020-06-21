@@ -2,11 +2,11 @@
   "isDnD": false,
   "isCompatibility": false,
   "parent": {
-    "name": "dotdae",
-    "path": "folders/dotdae.yy",
+    "name": "System",
+    "path": "folders/dotdae/System.yy",
   },
   "resourceVersion": "1.0",
-  "name": "dotdae_model_draw_texture",
+  "name": "__dotdae_model_load_inner__old",
   "tags": [],
   "resourceType": "GMScript",
 }

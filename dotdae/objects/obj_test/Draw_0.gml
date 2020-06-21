@@ -30,7 +30,7 @@ matrix_set(matrix_projection, matrix_build_projection_perspective_fov(90, room_w
 //Finally, draw the container
 //matrix_set(matrix_world, matrix_build(0,0,0,   0,90,90,   4,4,4));
 shader_set(shd_simple_lighting);
-dotdae_model_draw(container);
+container.draw();
 shader_reset();
 
 //Reset draw state

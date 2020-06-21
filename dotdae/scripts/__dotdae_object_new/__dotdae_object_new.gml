@@ -2,13 +2,9 @@
 /// @param type
 /// @param size
 /// @param trackingList
-function __dotdae_object_new(argument0, argument1, argument2, argument3) {
 
-    var _name = argument0;
-    var _type = argument1;
-    var _size = argument2;
-    var _list = argument3;
-
+function __dotdae_object_new(_name, _type, _size, _list)
+{
     var _array = array_create(_size, undefined);
     _array[@ __DOTDAE_NAME_INDEX] = (_name == undefined)? "<unnamed>" : _name;
     _array[@ __DOTDAE_TYPE_INDEX] = _type;
@@ -17,6 +13,4 @@ function __dotdae_object_new(argument0, argument1, argument2, argument3) {
     if (_list != undefined) ds_list_add(_list, _array);
 
     return _array;
-
-
 }

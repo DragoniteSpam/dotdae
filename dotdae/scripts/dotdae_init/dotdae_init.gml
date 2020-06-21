@@ -32,20 +32,6 @@ function dotdae_init()
     
     #region Internal Object Enums
     
-    enum eDotDae
-    {
-        Name, //Must be the same as __DOTDAE_NAME_INDEX
-        Type, //Must be the same as __DOTDAE_TYPE_INDEX
-        ObjectMap,
-        EffectList,
-        MaterialList,
-        ImageList,
-        GeometryList,
-        VertexBufferList,
-        ControllerList,
-        __Size
-    }
-    
     enum eDotDaeImage
     {
         Name, //Must be the same as __DOTDAE_NAME_INDEX
@@ -207,6 +193,68 @@ function dotdae_init()
     
     #macro __DOTDAE_NAME_INDEX   0 //Common position of an object's name
     #macro __DOTDAE_TYPE_INDEX   1 //Common position of an object's type
+    
+    #endregion
+    
+    #region Classes
+    
+    function dotdae_class_container() constructor
+    {
+        name               = "<unnamed>";
+        type               = "container";
+        object_map         = ds_map_create();
+        effect_list        = ds_list_create();
+        material_list      = ds_list_create();
+        image_list         = ds_list_create();
+        geometry_list      = ds_list_create();
+        vertex_buffer_list = ds_list_create();
+        controller_list    = ds_list_create();
+        
+        ///@param [forceTexture]
+        static draw = function()
+        {
+            var _force_texture = (argument_count > 0)? argument[0] : undefined;
+            
+            var _g = 0;
+            repeat(ds_list_size(geometry_list))
+            {
+                var _geometry = geometry_list[| _g];
+                var _mesh_array = _geometry[eDotDaeGeometry.MeshArray];
+                
+                var _m = 0;
+                repeat(array_length(_mesh_array))
+                {
+                    var _mesh = _mesh_array[_m];
+                    var _vbuff_array = _mesh[eDotDaeMesh.VertexBufferArray];
+                    
+                    var _v = 0;
+                    repeat(array_length(_vbuff_array))
+                    {
+                        var _vertex_buffer = _vbuff_array[_v];
+                        
+                        var _diffuse_texture = -1;
+                        if (_force_texture != undefined)
+                        {
+                            _diffuse_texture = _force_texture;
+                        }
+                        else
+                        {
+                            var _effect = _vertex_buffer[eDotDaePolyList.Effect];
+                            if (is_array(_effect)) _diffuse_texture = _effect[eDotDaeEffect.DiffuseTexture];
+                        }
+                        
+                        vertex_submit(_vertex_buffer[eDotDaePolyList.VertexBuffer], pr_trianglelist, _diffuse_texture);
+                        
+                        ++_v;
+                    }
+                    
+                    ++_m;
+                }
+                
+                ++_g;
+            }
+        }
+    }
     
     #endregion
 }

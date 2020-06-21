@@ -1,38 +1,29 @@
 /// Decodes an XML string stored in a buffer and outputs a sorta-JSON equivalent
 ///
-/// This script was written for the dotdae library, but it's usable in lots of other contexts too
-///
-/// @param buffer
-/// @param offset
-/// @param size
-///
-/// @jujuadams
-/// 2020-06-14
-function buffer_xml_decode(argument0, argument1, argument2) {
+/// @return Nested struct/array data that represents the contents of the XML string
+/// 
+/// @param buffer   The XML buffer to be decoded
+/// 
+/// @jujuadams 2020-06-14
 
-    var _buffer = argument0;
-    var _offset = argument1;
-    var _size   = argument2;
-
-    var _old_tell = buffer_tell(_buffer);
-    buffer_seek(_buffer, buffer_seek_start, _offset);
-
+function buffer_xml_decode(_buffer)
+{
     var _skip_whitespace = true;
-
+    
     var _in_key    = false;
     var _key_start = -1;
     var _key       = "";
-
+    
     var _in_value     = false;
     var _in_string    = false;
     var _string_start = 0;
     var _value        = "";
-
-    var _in_content            = false;
-    var _content               = "";
-    var _content_has_ampersand = false;
-    var _content_start         = 0;
-
+    
+    var _in_text            = false;
+    var _text               = "";
+    var _text_has_ampersand = false;
+    var _text_start         = 0;
+    
     var _in_tag                 = false;
     var _tag                    = "";
     var _tag_terminating        = false;
@@ -43,19 +34,18 @@ function buffer_xml_decode(argument0, argument1, argument2) {
     var _tag_start              = 0;
     var _tag_reading_attributes = false;
     var _tag_has_attributes     = false;
-
-    var _stack_map = ds_map_create();
-    _stack_map[? "-name"] = "xml prolog";
-
+    
+    var _root = {};
+    
+    var _stack_parent = undefined;
+    var _stack_top =_root;
     var _stack = ds_list_create();
-    ds_list_add(_stack, _stack_map);
-
-    var _root = _stack_map;
-
-    repeat(_size)
+    ds_list_add(_stack, _stack_top);
+    
+    repeat(buffer_get_size(_buffer))
     {
         var _value = buffer_read(_buffer, buffer_u8);
-    
+        
         if (_skip_whitespace && (_value > 32)) _skip_whitespace = false;
     
         if (!_skip_whitespace)
@@ -88,7 +78,7 @@ function buffer_xml_decode(argument0, argument1, argument2) {
                     {
                         if (_value == ord("&")) //Check for ampersands so we can trigger a find-replace on the output value
                         {
-                            _content_has_ampersand = true;
+                            _text_has_ampersand = true;
                         }
                         else if (_value == ord("\"")) //End string
                         {
@@ -96,7 +86,7 @@ function buffer_xml_decode(argument0, argument1, argument2) {
                             buffer_seek(_buffer, buffer_seek_start, _string_start);
                             _value = buffer_read(_buffer, buffer_string);
                         
-                            if (_content_has_ampersand) //Only run these checks if we found an ampersand
+                            if (_text_has_ampersand) //Only run these checks if we found an ampersand
                             {
                                 _value = string_replace_all(_value, "&lt;"  , "<");
                                 _value = string_replace_all(_value, "&gt;"  , ">");
@@ -105,13 +95,16 @@ function buffer_xml_decode(argument0, argument1, argument2) {
                                 _value = string_replace_all(_value, "&quot;", "\"");
                             }
                         
-                            if (_tag_is_prolog)
+                            if (!_tag_is_comment)
                             {
-                                _root[? _key] = _value;
-                            }
-                            else if (!_tag_is_comment)
-                            {
-                                _stack_map[? _key] = _value;
+                                var _attributes_struct = variable_struct_get(_stack_top, "_attr");
+                                if (_attributes_struct == undefined)
+                                {
+                                    _attributes_struct = {};
+                                    variable_struct_set(_stack_top, "_attr", _attributes_struct);
+                                }
+                                
+                                variable_struct_set(_attributes_struct, _key, _value);
                             }
                         
                             _in_key          = true;
@@ -133,34 +126,45 @@ function buffer_xml_decode(argument0, argument1, argument2) {
                         case ord("?"): //Prolog indicator
                             if (buffer_tell(_buffer) == _tag_start + 1) _tag_is_prolog = true;
                         break;
-                
+                        
                         case ord("!"): //Comment indicator
                             if (buffer_tell(_buffer) == _tag_start + 1) _tag_is_comment = true;
                         break;
-                
+                        
                         case ord("/"): //Close tag indicator
                             if (buffer_tell(_buffer) == _tag_start + 1) _tag_terminating = true;
                         break;
-                
-                        case ord(" "):
-                            buffer_poke(_buffer, buffer_tell(_buffer)-1, buffer_u8, 0x0);
-                            buffer_seek(_buffer, buffer_seek_start, _tag_start);
-                            _tag = buffer_read(_buffer, buffer_string);
                         
-                            if (!_tag_is_prolog && !_tag_is_comment)
+                        case ord(" "):
+                            if (_tag_is_prolog)
                             {
-                                var _parent_map = _stack_map;
-                                var _children = _parent_map[? "-children"];
-                                if (_children == undefined)
-                                {
-                                    _children = ds_list_create();
-                                    ds_map_add_list(_parent_map, "-children", _children);
-                                }
+                                _tag = "_prolog";
+                            }
+                            else
+                            {
+                                buffer_poke(_buffer, buffer_tell(_buffer)-1, buffer_u8, 0x0);
+                                buffer_seek(_buffer, buffer_seek_start, _tag_start);
+                                _tag = buffer_read(_buffer, buffer_string);
+                            }
                             
-                                _stack_map = ds_map_create();
-                                _stack_map[? "-name"] = _tag;
-                                ds_list_add(_children, _stack_map);
-                                ds_list_mark_as_map(_children, ds_list_size(_children)-1);
+                            if ((!_tag_is_comment) && (!_tag_terminating))
+                            {
+                                _stack_top = {};
+                                ds_list_insert(_stack, 0, _stack_top);
+                                
+                                var _parent_tag_value = variable_struct_get(_stack_parent, _tag);
+                                if (_parent_tag_value == undefined)
+                                {
+                                    variable_struct_set(_stack_parent, _tag, _stack_top);
+                                }
+                                else if (is_array(_parent_tag_value))
+                                {
+                                    _parent_tag_value[@ array_length(_parent_tag_value)] = _stack_top;
+                                }
+                                else
+                                {
+                                    variable_struct_set(_stack_parent, _tag, [_parent_tag_value, _stack_top]);
+                                }
                             }
                         
                             _in_key                 = true;
@@ -173,53 +177,66 @@ function buffer_xml_decode(argument0, argument1, argument2) {
         
                 if (!_in_string && (_value == ord(">")))
                 {
-                    if (!_tag_reading_attributes && !_tag_is_prolog && !_tag_is_comment)
+                    if (!_tag_reading_attributes && !_tag_is_comment)
                     {
-                        buffer_poke(_buffer, buffer_tell(_buffer)-1, buffer_u8, 0x0);
-                        buffer_seek(_buffer, buffer_seek_start, _tag_start);
-                        _tag = buffer_read(_buffer, buffer_string);
-                    
+                        if (_tag_is_prolog)
+                        {
+                            _tag = "_prolog";
+                        }
+                        else
+                        {
+                            buffer_poke(_buffer, buffer_tell(_buffer)-1, buffer_u8, 0x0);
+                            buffer_seek(_buffer, buffer_seek_start, _tag_start);
+                            _tag = buffer_read(_buffer, buffer_string);
+                        }
+                        
                         if (!_tag_terminating)
                         {
-                            var _parent_map = _stack_map;
-                            var _children = _parent_map[? "-children"];
-                            if (_children == undefined)
+                            _stack_top = {};
+                            ds_list_insert(_stack, 0, _stack_top);
+                            
+                            var _parent_tag_value = variable_struct_get(_stack_parent, _tag);
+                            if (_parent_tag_value == undefined)
                             {
-                                _children = ds_list_create();
-                                ds_map_add_list(_parent_map, "-children", _children);
+                                variable_struct_set(_stack_parent, _tag, _stack_top);
                             }
-                        
-                            _stack_map = ds_map_create();
-                            _stack_map[? "-name"] = _tag;
-                            ds_list_add(_children, _stack_map);
-                            ds_list_mark_as_map(_children, ds_list_size(_children)-1);
+                            else if (is_array(_parent_tag_value))
+                            {
+                                _parent_tag_value[@ array_length(_parent_tag_value)] = _stack_top;
+                            }
+                            else
+                            {
+                                variable_struct_set(_stack_parent, _tag, [_parent_tag_value, _stack_top]);
+                            }
                         }
                     }
-                
+                    
                     var _previous_value = buffer_peek(_buffer, buffer_tell(_buffer)-2, buffer_u8);
-                    if ((_previous_value == ord("?")) || (_previous_value == ord("/"))) //Detect /> or ?> method to close a tag
+                    if (_previous_value == ord("?")) //Detect ?> method to close the prolog
+                    {
+                        _tag_terminating = true;
+                    }
+                    else if (_previous_value == ord("/")) //Detect /> method to close a tag
                     {
                         _tag_terminating      = true;
                         _tag_self_terminating = true;
                     }
-                
-                    if (!_tag_is_prolog && !_tag_is_comment && !_tag_self_terminating)
+                    
+                    if (!_tag_is_comment && !_tag_self_terminating)
                     {
-                        if (_tag_terminating)
+                        if (_tag_terminating || _tag_is_prolog)
                         {
                             ds_list_delete(_stack, 0);
-                            _stack_map = _stack[| 0];
+                            _stack_top = _stack[| 0];
                         }
                         else
                         {
-                            ds_list_insert(_stack, 0, _stack_map);
-                        
-                            _in_content            = true;
-                            _content_has_ampersand = false;
-                            _content_start         = buffer_tell(_buffer);
+                            _in_text            = true;
+                            _text_has_ampersand = false;
+                            _text_start         = buffer_tell(_buffer);
                         }
                     }
-                
+                    
                     _in_tag   = false;
                     _in_key   = false;
                     _in_value = false;
@@ -227,21 +244,22 @@ function buffer_xml_decode(argument0, argument1, argument2) {
             }
             else if ((_value == 10) || (_value == 13)) //Newline
             {
-                _in_content      = false;
+                _in_text        = false;
                 _skip_whitespace = true;
             }
             else if (_value == ord("<")) //Open a tag
             {
-                if (_in_content)
+                if (_in_text)
                 {
-                    _in_content = false;
+                    _in_text = false;
                     buffer_poke(_buffer, buffer_tell(_buffer)-1, buffer_u8, 0x0);
-                    buffer_seek(_buffer, buffer_seek_start, _content_start);
-                    _content = buffer_read(_buffer, buffer_string);
-                
-                    _stack_map[? "-content"] = _content;
+                    buffer_seek(_buffer, buffer_seek_start, _text_start);
+                    _text = buffer_read(_buffer, buffer_string);
+                    
+                    variable_struct_set(_stack_top, "_text", _text);
                 }
             
+                _stack_parent           = _stack_top;
                 _in_tag                 = true;
                 _tag_terminating        = false;
                 _tag_self_terminating   = false;
@@ -256,9 +274,6 @@ function buffer_xml_decode(argument0, argument1, argument2) {
     }
 
     ds_list_destroy(_stack);
-    buffer_seek(_buffer, buffer_seek_start, _old_tell);
 
     return _root
-
-
 }

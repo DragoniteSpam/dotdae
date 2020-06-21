@@ -15,51 +15,42 @@ function dotdae_model_load(_buffer)
     
     var _flip_texcoords    = global.__dotdae_flip_texcoord_v;
     var _reverse_triangles = global.__dotdae_reverse_triangles;
-
-    //Create a bunch of data structures to contain data
-    var _dae_object_map          = ds_map_create();
-    var _dae_effects_list        = ds_list_create();
-    var _dae_materials_list      = ds_list_create();
-    var _dae_images_list         = ds_list_create();
-    var _dae_geometries_list     = ds_list_create();
-    var _dae_vertex_buffers_list = ds_list_create();
-    var _dae_controllers_list    = ds_list_create();
-
-    //Make a container array and add the data structures to it
-    var _container = array_create(eDotDae.__Size, undefined);
-    _container[@ eDotDae.Name            ] = "<unnamed>";
-    _container[@ eDotDae.Type            ] = "containter"
-    _container[@ eDotDae.ObjectMap       ] = _dae_object_map;
-    _container[@ eDotDae.EffectList      ] = _dae_effects_list;
-    _container[@ eDotDae.MaterialList    ] = _dae_materials_list;
-    _container[@ eDotDae.ImageList       ] = _dae_images_list;
-    _container[@ eDotDae.GeometryList    ] = _dae_geometries_list;
-    _container[@ eDotDae.VertexBufferList] = _dae_vertex_buffers_list;
-    _container[@ eDotDae.ControllerList  ] = _dae_controllers_list;
-
+    
+    //Make a container struct and add the data structures to it
+    var _container = new dotdae_class_container();
+    var _dae_object_map          = _container.object_map;
+    var _dae_effects_list        = _container.effect_list;
+    var _dae_materials_list      = _container.material_list;
+    var _dae_images_list         = _container.image_list;
+    var _dae_geometries_list     = _container.geometry_list;
+    var _dae_vertex_buffers_list = _container.vertex_buffer_list;
+    var _dae_controllers_list    = _container.controller_list;
+    
     //Define some global variables that'll get referenced in __dotdae_model_load_inner()
     global.__dae_stack               = ds_list_create();
-    global.__dae_object_map          = _dae_object_map;
-    global.__dae_effects_list        = _dae_effects_list;
-    global.__dae_materials_list      = _dae_materials_list;
-    global.__dae_images_list         = _dae_images_list;
-    global.__dae_geometries_list     = _dae_geometries_list;
-    global.__dae_vertex_buffers_list = _dae_vertex_buffers_list;
-    global.__dae_controllers_list    = _dae_controllers_list;
+    global.__dae_object_map          = _container.object_map;
+    global.__dae_effects_list        = _container.effect_list;
+    global.__dae_materials_list      = _container.material_list;
+    global.__dae_images_list         = _container.image_list;
+    global.__dae_geometries_list     = _container.geometry_list;
+    global.__dae_vertex_buffers_list = _container.vertex_buffer_list;
+    global.__dae_controllers_list    = _container.controller_list;
 
     //Parse the .dae XML found in the buffer
     if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Parsing XML... (This may take some time)");
-    var _xml = buffer_xml_decode(_buffer, 0, buffer_get_size(_buffer));
+    var _xml = buffer_xml_decode(_buffer);
     if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("...finished parsing XML");
 
     //Traverse the generated XML and build a data structure we can use
     if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Traversing data structure...");
-    __dotdae_model_load_inner(_xml, undefined);
+    
+    with(_container)
+    {
+        __dotdae_model_load_inner(_xml, "_root");
+    }
+    
     if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("...finished traversing data structure");
-
-    //Clean up the XML data
-    ds_map_destroy(_xml);
-
+    
     #region Pre-process effect -> texture so we need less code in dotdae_model_draw()
 
     if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Pre-processing effect -> texture links");
