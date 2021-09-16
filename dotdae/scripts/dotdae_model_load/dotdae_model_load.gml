@@ -85,7 +85,7 @@ function dotdae_model_load(_buffer)
     
         //Get our material data
         var _material_name = _object[eDotDaePolyList.Material];
-        var _material = _dae_object_map[$ _material_name];
+        var _material = (_material_name != undefined) ? _dae_object_map[$ _material_name] : undefined;
     
         if (is_array(_material))
         {
