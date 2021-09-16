@@ -8,8 +8,6 @@
 /// to GameMaker's atlased UV space.
 /// 
 /// @param filename        File to read from
-/// @param flipUVs         Whether to flip the y-axis (V-component) of the texture coordinates. This is useful to correct for DirectX / OpenGL idiosyncrasies
-/// @param reverseTris     Whether to reverse the triangle definition order to be compatible with the culling mode of your choice (clockwise/counter-clockwise)
 
 function dotdae_model_load_file(_filename)
 {
