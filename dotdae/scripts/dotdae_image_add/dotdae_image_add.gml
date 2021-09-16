@@ -22,7 +22,7 @@ function dotdae_image_add(_sprite, _relative_path)
     _object[@ eDotDaeImage.Texture     ] = _texture;
     _object[@ eDotDaeImage.External    ] = false;
     
-    global.dae_image_library[? _relative_path] = _object;
+    global.dae_image_library[$ _relative_path] = _object;
     
     if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Sprite \"", sprite_get_name(_sprite), "\" added as image, spoofing \"", _relative_path, "\" (sprite=", _sprite, ", texture=", _texture, ")");
 }

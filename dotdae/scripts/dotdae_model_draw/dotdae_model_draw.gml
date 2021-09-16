@@ -1,13 +1,10 @@
 /// @param container
-function dotdae_model_draw(argument0) {
-
-    var _container = argument0;
-
+function dotdae_model_draw(_container) {
     var _geometry_list = _container[eDotDae.GeometryList];
     var _g = 0;
-    repeat(ds_list_size(_geometry_list))
+    repeat(array_length(_geometry_list))
     {
-        var _geometry = _geometry_list[| _g];
+        var _geometry = _geometry_list[_g];
         var _mesh_array = _geometry[eDotDaeGeometry.MeshArray];
     
         var _m = 0;
@@ -35,6 +32,4 @@ function dotdae_model_draw(argument0) {
     
         ++_g;
     }
-
-
 }

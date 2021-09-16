@@ -17,13 +17,13 @@ function dotdae_model_load(_buffer)
     var _reverse_triangles = global.__dotdae_reverse_triangles;
 
     //Create a bunch of data structures to contain data
-    var _dae_object_map          = ds_map_create();
-    var _dae_effects_list        = ds_list_create();
-    var _dae_materials_list      = ds_list_create();
-    var _dae_images_list         = ds_list_create();
-    var _dae_geometries_list     = ds_list_create();
-    var _dae_vertex_buffers_list = ds_list_create();
-    var _dae_controllers_list    = ds_list_create();
+    var _dae_object_map          = { };
+    var _dae_effects_list        = [];
+    var _dae_materials_list      = [];
+    var _dae_images_list         = [];
+    var _dae_geometries_list     = [];
+    var _dae_vertex_buffers_list = [];
+    var _dae_controllers_list    = [];
 
     //Make a container array and add the data structures to it
     var _container = array_create(eDotDae.__Size, undefined);
@@ -38,7 +38,7 @@ function dotdae_model_load(_buffer)
     _container[@ eDotDae.ControllerList  ] = _dae_controllers_list;
 
     //Define some global variables that'll get referenced in __dotdae_model_load_inner()
-    global.__dae_stack               = ds_list_create();
+    global.__dae_stack               = [];
     global.__dae_object_map          = _dae_object_map;
     global.__dae_effects_list        = _dae_effects_list;
     global.__dae_materials_list      = _dae_materials_list;
@@ -57,16 +57,13 @@ function dotdae_model_load(_buffer)
     __dotdae_model_load_inner(_xml, undefined);
     if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("...finished traversing data structure");
 
-    //Clean up the XML data
-    ds_map_destroy(_xml);
-
     #region Pre-process effect -> texture so we need less code in dotdae_model_draw()
 
     if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Pre-processing effect -> texture links");
     var _e = 0;
-    repeat(ds_list_size(_dae_effects_list))
+    repeat(array_length(_dae_effects_list))
     {
-        var _effect = _dae_effects_list[| _e];
+        var _effect = _dae_effects_list[_e];
         __dotdae_resolve_effect_texture(_dae_object_map, _effect, eDotDaeEffect.EmissionImageName , eDotDaeEffect.EmissionTexture );
         __dotdae_resolve_effect_texture(_dae_object_map, _effect, eDotDaeEffect.AmbientImageName  , eDotDaeEffect.AmbientTexture  );
         __dotdae_resolve_effect_texture(_dae_object_map, _effect, eDotDaeEffect.DiffuseImageName  , eDotDaeEffect.DiffuseTexture  );
@@ -81,14 +78,14 @@ function dotdae_model_load(_buffer)
 
     if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Pre-processing vertex buffer -> effect links");
     var _v = 0;
-    repeat(ds_list_size(_dae_vertex_buffers_list))
+    repeat(array_length(_dae_vertex_buffers_list))
     {
         //Grab our object definition from our list of vertex buffers
-        var _object = _dae_vertex_buffers_list[| _v];
+        var _object = _dae_vertex_buffers_list[_v];
     
         //Get our material data
         var _material_name = _object[eDotDaePolyList.Material];
-        var _material = _dae_object_map[? _material_name];
+        var _material = _dae_object_map[$ _material_name];
     
         if (is_array(_material))
         {
@@ -109,10 +106,10 @@ function dotdae_model_load(_buffer)
 
     if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Building vertex buffers...");
     var _v = 0;
-    repeat(ds_list_size(_dae_vertex_buffers_list))
+    repeat(array_length(_dae_vertex_buffers_list))
     {
         //Grab our object definition from our list of vertex buffers
-        var _object = _dae_vertex_buffers_list[| _v];
+        var _object = _dae_vertex_buffers_list[_v];
     
         if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Building \"", _object[eDotDaePolyList.Name], "\" using material \"", _object[eDotDaePolyList.Material], "\"");
     
@@ -122,7 +119,7 @@ function dotdae_model_load(_buffer)
     
         //Break down the string found in the <p> tag into a list of indexes
         var _index_list  = __dotdae_string_decompose_list(_pstring, true);
-        var _index_count = ds_list_size(_index_list);
+        var _index_count = array_length(_index_list);
     
         //Figure out how many vertices we have
         //This *should* match the value we found in the file
@@ -136,10 +133,10 @@ function dotdae_model_load(_buffer)
         #region Extract position/normal/colour/texcoord data from the geometry definition
     
         //Create some variables...
-        var _position_index_list = ds_list_create();
-        var _normal_index_list   = ds_list_create();
-        var _colour_index_list   = ds_list_create();
-        var _texcoord_index_list = ds_list_create();
+        var _position_index_list = [];
+        var _normal_index_list   = [];
+        var _colour_index_list   = [];
+        var _texcoord_index_list = [];
         var _position_source     = undefined;
         var _normal_source       = undefined;
         var _colour_source       = undefined;
@@ -154,7 +151,7 @@ function dotdae_model_load(_buffer)
             var _semantic    = _input[eDotDaeInput.Semantic];
         
             if (string_char_at(_source_name, 1) == "#") _source_name = string_delete(_source_name, 1, 1);
-            var _source = _dae_object_map[? _source_name];
+            var _source = _dae_object_map[$ _source_name];
         
             //Handle VERTEX -> POSITION weirdness
             if (_source[__DOTDAE_TYPE_INDEX] == "vertices")
@@ -166,7 +163,7 @@ function dotdae_model_load(_buffer)
                 _semantic    = _temp_input[eDotDaeInput.Semantic];
             
                 if (string_char_at(_source_name, 1) == "#") _source_name = string_delete(_source_name, 1, 1);
-                _source = _dae_object_map[? _source_name];
+                _source = _dae_object_map[$ _source_name];
             }
         
             var _source_array = _source[eDotDaeSource.FloatArray];
@@ -205,7 +202,7 @@ function dotdae_model_load(_buffer)
                 var _j = real(_input[eDotDaeInput.Offset]);
                 repeat(_vertex_count)
                 {
-                    ds_list_add(_collection_list, _index_list[| _j]);
+                    array_push(_collection_list, _index_list[_j]);
                     _j += _input_count;
                 }
             }
@@ -219,12 +216,12 @@ function dotdae_model_load(_buffer)
     
         //Create some variables...
         var _joint_vertex_count  = 0;
-        var _vstring_lookup_list = ds_list_create();
+        var _vstring_lookup_list = [];
         var _vcount_list         = undefined;
         var _v_list              = undefined;
         var _weight_source       = undefined;
     
-        var _controller = _dae_object_map[? _controller_name];
+        var _controller = _dae_object_map[$ _controller_name];
         if (_controller != undefined)
         {
             var _vertex_weights = _controller[eDotDaeController.VertexWeights];
@@ -235,10 +232,10 @@ function dotdae_model_load(_buffer)
         
             var _i = 0;
             var _p = 0;
-            repeat(ds_list_size(_vcount_list))
+            repeat(array_length(_vcount_list))
             {
-                ds_list_add(_vstring_lookup_list, _p);
-                _p += 2*_vcount_list[| _i];
+                array_push(_vstring_lookup_list, _p);
+                _p += 2*_vcount_list[_i];
             }
         
             //Find the joint weight values
@@ -253,7 +250,7 @@ function dotdae_model_load(_buffer)
                 if (_semantic == "WEIGHT")
                 {
                     if (string_char_at(_source_name, 1) == "#") _source_name = string_delete(_source_name, 1, 1);
-                    var _source = _dae_object_map[? _source_name];
+                    var _source = _dae_object_map[$ _source_name];
                     var _source_array = _source[eDotDaeSource.FloatArray];
                     _weight_source = _source_array[eDotDaeFloatArray.List];
                 }
@@ -266,11 +263,11 @@ function dotdae_model_load(_buffer)
     
         //Figure out a format code based on which index lists have sufficient data
         var _format_code = 0;
-        if (ds_list_size(_position_index_list) >= _vertex_count) _format_code |= DOTDAE_FORMAT_P;
-        if (ds_list_size(_normal_index_list  ) >= _vertex_count) _format_code |= DOTDAE_FORMAT_N;
-        if (ds_list_size(_colour_index_list  ) >= _vertex_count) _format_code |= DOTDAE_FORMAT_C;
-        if (ds_list_size(_texcoord_index_list) >= _vertex_count) _format_code |= DOTDAE_FORMAT_T;
-        if ((_joint_vertex_count >= ds_list_size(_position_source)/3) && (_weight_source != undefined)) _format_code |= DOTDAE_FORMAT_J;
+        if (array_length(_position_index_list) >= _vertex_count) _format_code |= DOTDAE_FORMAT_P;
+        if (array_length(_normal_index_list  ) >= _vertex_count) _format_code |= DOTDAE_FORMAT_N;
+        if (array_length(_colour_index_list  ) >= _vertex_count) _format_code |= DOTDAE_FORMAT_C;
+        if (array_length(_texcoord_index_list) >= _vertex_count) _format_code |= DOTDAE_FORMAT_T;
+        if ((_joint_vertex_count >= array_length(_position_source)/3) && (_weight_source != undefined)) _format_code |= DOTDAE_FORMAT_J;
         _object[@ eDotDaePolyList.FormatCode] = _format_code;
     
         if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("          ^-- format code = ", _format_code);
@@ -295,33 +292,33 @@ function dotdae_model_load(_buffer)
                 repeat(_vertex_count)
                 {
                     //Write the position
-                    var _v = _position_index_list[| _i];
+                    var _v = _position_index_list[_i];
                     var _q = 3*_v;
-                    vertex_position_3d(_vbuff, _position_source[| _q], _position_source[| _q+1], _position_source[| _q+2]);
+                    vertex_position_3d(_vbuff, _position_source[_q], _position_source[_q+1], _position_source[_q+2]);
                 
                     //Write the normal
-                    var _q = 3*_normal_index_list[| _i];
-                    vertex_normal(_vbuff, _normal_source[| _q], _normal_source[| _q+1], _normal_source[| _q+2]);
+                    var _q = 3*_normal_index_list[_i];
+                    vertex_normal(_vbuff, _normal_source[_q], _normal_source[_q+1], _normal_source[_q+2]);
                 
                     //Write the colour
-                    var _q = 3*_colour_index_list[| _i];
-                    var _colour = make_colour_rgb(255*_colour_source[| _q], 255*_colour_source[| _q+1], 255*_colour_source[| _q+2]);
+                    var _q = 3*_colour_index_list[_i];
+                    var _colour = make_colour_rgb(255*_colour_source[_q], 255*_colour_source[_q+1], 255*_colour_source[_q+2]);
                     vertex_color(_vbuff, _colour, 1.0);
                 
                     //Write the UV
-                    var _q = 2*_texcoord_index_list[| _i];
+                    var _q = 2*_texcoord_index_list[_i];
                     if (_flip_texcoords) //TODO - Move this if-check outside the loop?
                     {
-                        vertex_texcoord(_vbuff, _texcoord_source[| _q], 1.0 - _texcoord_source[| _q+1]);
+                        vertex_texcoord(_vbuff, _texcoord_source[_q], 1.0 - _texcoord_source[_q+1]);
                     }
                     else
                     {
-                        vertex_texcoord(_vbuff, _texcoord_source[| _q], _texcoord_source[| _q+1]);
+                        vertex_texcoord(_vbuff, _texcoord_source[_q], _texcoord_source[_q+1]);
                     }
                 
                     //Write joint indexes/weights
-                    var _pos = _vstring_lookup_list[| _v];
-                    var _joint_count = _vcount_list[| _v];
+                    var _pos = _vstring_lookup_list[_v];
+                    var _joint_count = _vcount_list[_v];
                     switch(_joint_count)
                     {
                         case 0:
@@ -330,30 +327,30 @@ function dotdae_model_load(_buffer)
                         break;
                     
                         case 1:
-                            vertex_float4(_vbuff,                  _v_list[| _pos   ], 0, 0, 0);
-                            vertex_float4(_vbuff, _weight_source[| _v_list[| _pos+1]], 0, 0, 0);
+                            vertex_float4(_vbuff,                _v_list[_pos   ], 0, 0, 0);
+                            vertex_float4(_vbuff, _weight_source[_v_list[_pos+1]], 0, 0, 0);
                         break;
                     
                         case 2:
-                            vertex_float4(_vbuff,                  _v_list[| _pos  ] ,                  _v_list[| _pos+2] , 0, 0);
-                            vertex_float4(_vbuff, _weight_source[| _v_list[| _pos+1]], _weight_source[| _v_list[| _pos+3]], 0, 0);
+                            vertex_float4(_vbuff,                _v_list[_pos  ] ,                _v_list[_pos+2] , 0, 0);
+                            vertex_float4(_vbuff, _weight_source[_v_list[_pos+1]], _weight_source[_v_list[_pos+3]], 0, 0);
                         break;
                     
                         case 3:
-                            vertex_float4(_vbuff,                  _v_list[| _pos  ] ,                  _v_list[| _pos+2] ,                  _v_list[| _pos+4] , 0);
-                            vertex_float4(_vbuff, _weight_source[| _v_list[| _pos+1]], _weight_source[| _v_list[| _pos+3]], _weight_source[| _v_list[| _pos+5]], 0);
+                            vertex_float4(_vbuff,                _v_list[_pos  ] ,                _v_list[_pos+2] ,                _v_list[_pos+4] , 0);
+                            vertex_float4(_vbuff, _weight_source[_v_list[_pos+1]], _weight_source[_v_list[_pos+3]], _weight_source[_v_list[_pos+5]], 0);
                         break;
                     
                         case 4:
-                            vertex_float4(_vbuff,                  _v_list[| _pos  ] ,                  _v_list[| _pos+2] ,                  _v_list[| _pos+4] ,                  _v_list[| _pos+6] );
-                            vertex_float4(_vbuff, _weight_source[| _v_list[| _pos+1]], _weight_source[| _v_list[| _pos+3]], _weight_source[| _v_list[| _pos+5]], _weight_source[| _v_list[| _pos+7]]);
+                            vertex_float4(_vbuff,                _v_list[_pos  ] ,                _v_list[_pos+2] ,                _v_list[_pos+4] ,                _v_list[_pos+6] );
+                            vertex_float4(_vbuff, _weight_source[_v_list[_pos+1]], _weight_source[_v_list[_pos+3]], _weight_source[_v_list[_pos+5]], _weight_source[_v_list[_pos+7]]);
                         break;
                     
                         //Higher order joint counts we just ignore. I dunno why people are making models with >4 joint weights per vertex, it's rare for a game engine to support that
                         default:
                             __dotdae_trace("WARNING! Joint count ", _joint_count, " exceeds maximum (4)");
-                            vertex_float4(_vbuff,                  _v_list[| _pos  ] ,                  _v_list[| _pos+2] ,                  _v_list[| _pos+4] ,                  _v_list[| _pos+6] );
-                            vertex_float4(_vbuff, _weight_source[| _v_list[| _pos+1]], _weight_source[| _v_list[| _pos+3]], _weight_source[| _v_list[| _pos+5]], _weight_source[| _v_list[| _pos+7]]);
+                            vertex_float4(_vbuff,                _v_list[_pos  ] ,                _v_list[_pos+2] ,                _v_list[_pos+4] ,                _v_list[_pos+6] );
+                            vertex_float4(_vbuff, _weight_source[_v_list[_pos+1]], _weight_source[_v_list[_pos+3]], _weight_source[_v_list[_pos+5]], _weight_source[_v_list[_pos+7]]);
                         break;
                     }
                 
@@ -603,16 +600,6 @@ function dotdae_model_load(_buffer)
         vertex_end(_vbuff);
         _object[@ eDotDaePolyList.VertexBuffer] = _vbuff;
     
-        //Clean up the mess we made
-        ds_list_destroy(_index_list         );
-        ds_list_destroy(_position_index_list);
-        ds_list_destroy(_normal_index_list  );
-        ds_list_destroy(_colour_index_list  );
-        ds_list_destroy(_texcoord_index_list);
-        ds_list_destroy(_vstring_lookup_list);
-        if (_v_list      != undefined) ds_list_destroy(_v_list     );
-        if (_vcount_list != undefined) ds_list_destroy(_vcount_list);
-    
         ++_v;
     }
 
@@ -621,7 +608,6 @@ function dotdae_model_load(_buffer)
     #endregion
 
     //Clean up
-    ds_list_destroy(global.__dae_stack);
     global.__dae_stack               = undefined;
     global.__dae_object_map          = undefined;
     global.__dae_object_on_stack     = undefined;

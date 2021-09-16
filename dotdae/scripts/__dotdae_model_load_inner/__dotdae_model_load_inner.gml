@@ -1,17 +1,13 @@
 /// @param map
 /// @param context
-function __dotdae_model_load_inner(argument0, argument1) {
-
-    var _map     = argument0;
-    var _context = argument1;
-
-    var _tag            = _map[? "-name"    ];
-    var _children       = _map[? "-children"];
-    var _content        = _map[? "-content" ];
-    var _id             = _map[? "id"       ];
+function __dotdae_model_load_inner(_map, _context) {
+    var _tag            = _map[$ "-name"    ];
+    var _children       = _map[$ "-children"];
+    var _content        = _map[$ "-content" ];
+    var _id             = _map[$ "id"       ];
     var _parse_children = true;
     var _return         = undefined;
-    var _stack_size     = ds_list_size(global.__dae_stack);
+    var _stack_size     = array_length(global.__dae_stack);
 
     switch(_tag)
     {
@@ -39,9 +35,9 @@ function __dotdae_model_load_inner(argument0, argument1) {
             var _object = __dotdae_object_new_push(_id, _tag, eDotDaeImage.__Size, global.__dae_images_list);
         
             var _i = 0;
-            repeat(ds_list_size(_children))
+            repeat(array_length(_children))
             {
-                __dotdae_model_load_inner(_children[| _i], _context);
+                __dotdae_model_load_inner(_children[_i], _context);
                 ++_i;
             }
         
@@ -53,7 +49,7 @@ function __dotdae_model_load_inner(argument0, argument1) {
         
             if (_relative_path != undefined)
             {
-                var _existing_data = global.dae_image_library[? _relative_path];
+                var _existing_data = global.dae_image_library[$ _relative_path];
                 if (is_array(_existing_data))
                 {
                     _object[@ eDotDaeImage.Sprite  ] = _existing_data[eDotDaeImage.Sprite  ];
@@ -79,7 +75,7 @@ function __dotdae_model_load_inner(argument0, argument1) {
                         _object[@ eDotDaeImage.Sprite  ] = _sprite;
                         _object[@ eDotDaeImage.Texture ] = sprite_get_texture(_sprite, 0);
                         _object[@ eDotDaeImage.External] = true;
-                        global.dae_image_library[? _relative_path] = _object;
+                        global.dae_image_library[$ _relative_path] = _object;
                     }
                 }
             }
@@ -91,17 +87,17 @@ function __dotdae_model_load_inner(argument0, argument1) {
     
         case "controller":
             var _object = __dotdae_object_new_push(_id, _tag, eDotDaeController.__Size, global.__dae_controllers_list);
-            _object[@ eDotDaeController.DisplayName] = _map[? "name"];
+            _object[@ eDotDaeController.DisplayName] = _map[$ "name"];
             _object[@ eDotDaeController.SourceArray] = [];
         
             if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Controller \"", _id, "\" added");
         break;
     
         case "skin":
-            var _source = _map[? "source"];
+            var _source = _map[$ "source"];
             if (string_char_at(_source, 1) == "#") _source = string_delete(_source, 1, 1);
         
-            var _polylist = global.__dae_object_map[? _source];
+            var _polylist = global.__dae_object_map[$ _source];
             _polylist[@ eDotDaePolyList.SkinController] = global.__dae_object_on_stack[__DOTDAE_NAME_INDEX];
         
             global.__dae_object_on_stack[eDotDaeController.ControllerType] = "skin";
@@ -118,7 +114,7 @@ function __dotdae_model_load_inner(argument0, argument1) {
             var _parent = global.__dae_object_on_stack;
         
             var _object = __dotdae_object_new_push(_id, _tag, eDotDaeVertexWeights.__Size, undefined);
-            _object[@ eDotDaeVertexWeights.Count     ] = real(_map[? "count"]);
+            _object[@ eDotDaeVertexWeights.Count     ] = real(_map[$ "count"]);
             _object[@ eDotDaeVertexWeights.InputArray] = [];
         
             _parent[@ eDotDaeController.VertexWeights] = _object;
@@ -197,9 +193,9 @@ function __dotdae_model_load_inner(argument0, argument1) {
                 var _parent = global.__dae_object_on_stack;
             
                 var _object = __dotdae_object_new(_id, _tag, eDotDaeInput.__Size, undefined);
-                _object[@ eDotDaeInput.Semantic] = _map[? "semantic"];
-                _object[@ eDotDaeInput.Source  ] = _map[? "source"  ];
-                _object[@ eDotDaeInput.Offset  ] = _map[? "offset"  ];
+                _object[@ eDotDaeInput.Semantic] = _map[$ "semantic"];
+                _object[@ eDotDaeInput.Source  ] = _map[$ "source"  ];
+                _object[@ eDotDaeInput.Offset  ] = _map[$ "offset"  ];
             
                 if (_parent[__DOTDAE_TYPE_INDEX] == "vertices")
                 {
@@ -218,9 +214,9 @@ function __dotdae_model_load_inner(argument0, argument1) {
                 var _parent = global.__dae_object_on_stack;
             
                 var _object = __dotdae_object_new(_id, _tag, eDotDaeInput.__Size, undefined);
-                _object[@ eDotDaeInput.Semantic] = _map[? "semantic"];
-                _object[@ eDotDaeInput.Source  ] = _map[? "source"  ];
-                _object[@ eDotDaeInput.Offset  ] = _map[? "offset"  ];
+                _object[@ eDotDaeInput.Semantic] = _map[$ "semantic"];
+                _object[@ eDotDaeInput.Source  ] = _map[$ "source"  ];
+                _object[@ eDotDaeInput.Offset  ] = _map[$ "offset"  ];
             
                 var _parent_source_array = _parent[eDotDaeVertexWeights.InputArray];
                 _parent_source_array[@ array_length(_parent_source_array)] = _object;
@@ -244,7 +240,7 @@ function __dotdae_model_load_inner(argument0, argument1) {
     
         case "effect":
             var _object = __dotdae_object_new_push(_id, _tag, eDotDaeEffect.__Size, global.__dae_effects_list);
-            _object[@ eDotDaeEffect.Parameters] = ds_map_create();
+            _object[@ eDotDaeEffect.Parameters] = { };
         
             if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Adding effect \"", _id, "\"");
         break;
@@ -276,8 +272,8 @@ function __dotdae_model_load_inner(argument0, argument1) {
         break;
     
         case "texture":
-            var _texture_name  = _map[? "texture" ];
-            var _texcoord_name = _map[? "texcoord"]; //Not used at the moment
+            var _texture_name  = _map[$ "texture" ];
+            var _texcoord_name = _map[$ "texcoord"]; //Not used at the moment
             switch(_context)
             {
                 case "emission":  global.__dae_object_on_stack[@ eDotDaeEffect.EmissionImageName ] = _texture_name; break;
@@ -301,13 +297,13 @@ function __dotdae_model_load_inner(argument0, argument1) {
         break;
     
         case "newparam":
-            var _sid = _map[? "sid"];
+            var _sid = _map[$ "sid"];
             var _object = array_create(eDotDaeParameter.__Size, undefined);
             _object[@ eDotDaeParameter.Name] = _sid;
             _object[@ eDotDaeParameter.Type] = _tag;
         
             var _parameter_map = global.__dae_object_on_stack[eDotDaeEffect.Parameters];
-            _parameter_map[? _sid] = _object;
+            _parameter_map[$ _sid] = _object;
         
             global.__dae_parameter = _object;
         break;
@@ -323,15 +319,15 @@ function __dotdae_model_load_inner(argument0, argument1) {
     
         case "material":
             var _object = __dotdae_object_new_push(_id, _tag, eDotDaeMaterial.__Size, global.__dae_materials_list);
-            _object[@ eDotDaeMaterial.DisplayName] = _map[? "name"];
+            _object[@ eDotDaeMaterial.DisplayName] = _map[$ "name"];
         break;
     
         case "instance_effect":
-            var _url = _map[? "url"];
+            var _url = _map[$ "url"];
             if (string_char_at(_url, 1) == "#") _url = string_delete(_url, 1, 1);
         
             //TODO - Error handling for when the effect can't be found
-            global.__dae_object_on_stack[@ eDotDaeMaterial.InstanceOf] = global.__dae_object_map[? _url];
+            global.__dae_object_on_stack[@ eDotDaeMaterial.InstanceOf] = global.__dae_object_map[$ _url];
         
             if (DOTDAE_OUTPUT_DEBUG) __dotdae_trace("Material \"", global.__dae_object_on_stack[eDotDaeMaterial.Name], "\" added, instance of effect \"", _url, "\"");
         break;
@@ -373,8 +369,8 @@ function __dotdae_model_load_inner(argument0, argument1) {
             var _vbuff_array = _parent[eDotDaeMesh.VertexBufferArray];
         
             var _object = __dotdae_object_new_push(_parent[__DOTDAE_NAME_INDEX], _tag, eDotDaePolyList.__Size, global.__dae_vertex_buffers_list);
-            _object[@ eDotDaePolyList.Count     ] = real(_map[? "count"]);
-            _object[@ eDotDaePolyList.Material  ] = _map[? "material"];
+            _object[@ eDotDaePolyList.Count     ] = real(_map[$ "count"]);
+            _object[@ eDotDaePolyList.Material  ] = _map[$ "material"];
             _object[@ eDotDaePolyList.InputArray] = [];
         
             _vbuff_array[@ array_length(_vbuff_array)] = _object;
@@ -390,21 +386,19 @@ function __dotdae_model_load_inner(argument0, argument1) {
     if (_parse_children && (_children != undefined))
     {
         var _i = 0;
-        repeat(ds_list_size(_children))
+        repeat(array_length(_children))
         {
-            __dotdae_model_load_inner(_children[| _i], _context);
+            __dotdae_model_load_inner(_children[_i], _context);
             ++_i;
         }
     }
 
     //If the stack size has changed, pop the object we pushed!
-    if (_stack_size != ds_list_size(global.__dae_stack))
+    if (_stack_size != array_length(global.__dae_stack))
     {
-        ds_list_delete(global.__dae_stack, ds_list_size(global.__dae_stack)-1);
-        global.__dae_object_on_stack = global.__dae_stack[| ds_list_size(global.__dae_stack)-1];
+        array_delete(global.__dae_stack, array_length(global.__dae_stack)-1, 1);
+        global.__dae_object_on_stack = global.__dae_stack[array_length(global.__dae_stack)-1];
     }
 
     return _return;
-
-
 }

@@ -12,6 +12,4 @@ function __dotdae_trace() {
 
     show_debug_message("dotdae: " + _string);
     return _string;
-
-
 }

@@ -8,12 +8,7 @@
 ///
 /// @jujuadams
 /// 2020-06-14
-function buffer_xml_decode(argument0, argument1, argument2) {
-
-    var _buffer = argument0;
-    var _offset = argument1;
-    var _size   = argument2;
-
+function buffer_xml_decode(_buffer, _offset, _size) {
     var _old_tell = buffer_tell(_buffer);
     buffer_seek(_buffer, buffer_seek_start, _offset);
 
@@ -44,11 +39,11 @@ function buffer_xml_decode(argument0, argument1, argument2) {
     var _tag_reading_attributes = false;
     var _tag_has_attributes     = false;
 
-    var _stack_map = ds_map_create();
-    _stack_map[? "-name"] = "xml prolog";
+    var _stack_map = { };
+    _stack_map[$ "-name"] = "xml prolog";
 
-    var _stack = ds_list_create();
-    ds_list_add(_stack, _stack_map);
+    var _stack = [];
+    array_push(_stack, _stack_map);
 
     var _root = _stack_map;
 
@@ -107,11 +102,11 @@ function buffer_xml_decode(argument0, argument1, argument2) {
                         
                             if (_tag_is_prolog)
                             {
-                                _root[? _key] = _value;
+                                _root[$ _key] = _value;
                             }
                             else if (!_tag_is_comment)
                             {
-                                _stack_map[? _key] = _value;
+                                _stack_map[$ _key] = _value;
                             }
                         
                             _in_key          = true;
@@ -150,17 +145,16 @@ function buffer_xml_decode(argument0, argument1, argument2) {
                             if (!_tag_is_prolog && !_tag_is_comment)
                             {
                                 var _parent_map = _stack_map;
-                                var _children = _parent_map[? "-children"];
+                                var _children = _parent_map[$ "-children"];
                                 if (_children == undefined)
                                 {
-                                    _children = ds_list_create();
-                                    ds_map_add_list(_parent_map, "-children", _children);
+                                    _children = [];
+                                    _parent_map[$ "-children"] = _children;
                                 }
                             
-                                _stack_map = ds_map_create();
-                                _stack_map[? "-name"] = _tag;
-                                ds_list_add(_children, _stack_map);
-                                ds_list_mark_as_map(_children, ds_list_size(_children)-1);
+                                _stack_map = { };
+                                _stack_map[$ "-name"] = _tag;
+                                array_push(_children, _stack_map);
                             }
                         
                             _in_key                 = true;
@@ -182,17 +176,16 @@ function buffer_xml_decode(argument0, argument1, argument2) {
                         if (!_tag_terminating)
                         {
                             var _parent_map = _stack_map;
-                            var _children = _parent_map[? "-children"];
+                            var _children = _parent_map[$ "-children"];
                             if (_children == undefined)
                             {
-                                _children = ds_list_create();
-                                ds_map_add_list(_parent_map, "-children", _children);
+                                _children = [];
+                                _parent_map[$ "-children"] = _children;
                             }
                         
-                            _stack_map = ds_map_create();
-                            _stack_map[? "-name"] = _tag;
-                            ds_list_add(_children, _stack_map);
-                            ds_list_mark_as_map(_children, ds_list_size(_children)-1);
+                            _stack_map = { };
+                            _stack_map[$ "-name"] = _tag;
+                            array_push(_children, _stack_map);
                         }
                     }
                 
@@ -207,12 +200,12 @@ function buffer_xml_decode(argument0, argument1, argument2) {
                     {
                         if (_tag_terminating)
                         {
-                            ds_list_delete(_stack, 0);
-                            _stack_map = _stack[| 0];
+                            array_delete(_stack, 0, 1);
+                            _stack_map = _stack[0];
                         }
                         else
                         {
-                            ds_list_insert(_stack, 0, _stack_map);
+                            array_insert(_stack, 0, _stack_map);
                         
                             _in_content            = true;
                             _content_has_ampersand = false;
@@ -239,7 +232,7 @@ function buffer_xml_decode(argument0, argument1, argument2) {
                     buffer_seek(_buffer, buffer_seek_start, _content_start);
                     _content = buffer_read(_buffer, buffer_string);
                 
-                    _stack_map[? "-content"] = _content;
+                    _stack_map[$ "-content"] = _content;
                 }
             
                 _in_tag                 = true;
@@ -255,10 +248,7 @@ function buffer_xml_decode(argument0, argument1, argument2) {
         }
     }
 
-    ds_list_destroy(_stack);
     buffer_seek(_buffer, buffer_seek_start, _old_tell);
 
     return _root
-
-
 }

@@ -1,4 +1,4 @@
-global.dae_image_library = ds_map_create();
+global.dae_image_library = { };
 global.__dotdae_flip_texcoord_v   = false;
 global.__dotdae_reverse_triangles = false;
 

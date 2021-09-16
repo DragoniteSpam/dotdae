@@ -1,15 +1,11 @@
 /// @param container
 /// @param texture
-function dotdae_model_draw_texture(argument0, argument1) {
-
-    var _container = argument0;
-    var _texture   = argument1;
-
+function dotdae_model_draw_texture(_container, _texture) {
     var _geometry_list = _container[eDotDae.GeometryList];
     var _g = 0;
-    repeat(ds_list_size(_geometry_list))
+    repeat(array_length(_geometry_list))
     {
-        var _geometry = _geometry_list[| _g];
+        var _geometry = _geometry_list[_g];
         var _mesh_array = _geometry[eDotDaeGeometry.MeshArray];
     
         var _m = 0;
@@ -31,6 +27,4 @@ function dotdae_model_draw_texture(argument0, argument1) {
     
         ++_g;
     }
-
-
 }

@@ -1,10 +1,6 @@
 /// @param string
 /// @param outputReal
-function __dotdae_string_decompose_array(argument0, argument1) {
-
-    var _string      = argument0;
-    var _output_real = argument1;
-
+function __dotdae_string_decompose_array(_string, _output_real) {
     var _size = string_byte_length(_string) + 1;
     var _buffer = buffer_create(_size, buffer_fixed, 1);
     buffer_write(_buffer, buffer_text, _string);
@@ -33,6 +29,4 @@ function __dotdae_string_decompose_array(argument0, argument1) {
     buffer_delete(_buffer);
 
     return _array;
-
-
 }

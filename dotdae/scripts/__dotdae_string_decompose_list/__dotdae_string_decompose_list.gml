@@ -1,16 +1,12 @@
 /// @param string
 /// @param outputReal
-function __dotdae_string_decompose_list(argument0, argument1) {
-
-    var _string      = argument0;
-    var _output_real = argument1;
-
+function __dotdae_string_decompose_list(_string, _output_real) {
     var _size = string_byte_length(_string) + 1;
     var _buffer = buffer_create(_size, buffer_fixed, 1);
     buffer_write(_buffer, buffer_text, _string);
     buffer_seek(_buffer, buffer_seek_start, 0);
 
-    var _list = ds_list_create();
+    var _list = [];
 
     var _substring_start = 0;
     repeat(_size)
@@ -24,7 +20,7 @@ function __dotdae_string_decompose_list(argument0, argument1) {
             if (_substring != "")
             {
                 if (_output_real) _substring = real(_substring);
-                ds_list_add(_list, _substring);
+                array_push(_list, _substring);
             }
             _substring_start = buffer_tell(_buffer);
         }
@@ -33,6 +29,4 @@ function __dotdae_string_decompose_list(argument0, argument1) {
     buffer_delete(_buffer);
 
     return _list;
-
-
 }
