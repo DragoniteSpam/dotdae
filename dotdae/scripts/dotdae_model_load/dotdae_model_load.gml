@@ -221,41 +221,43 @@ function dotdae_model_load(_buffer)
         var _v_list              = undefined;
         var _weight_source       = undefined;
     
+        if (_controller_name != undefined) {
         var _controller = _dae_object_map[$ _controller_name];
-        if (_controller != undefined)
-        {
-            var _vertex_weights = _controller[eDotDaeController.VertexWeights];
-            _joint_vertex_count = _vertex_weights[eDotDaeVertexWeights.Count];
-        
-            _v_list      = __dotdae_string_decompose_list(_vertex_weights[eDotDaeVertexWeights.VString     ], true);
-            _vcount_list = __dotdae_string_decompose_list(_vertex_weights[eDotDaeVertexWeights.VCountString], true);
-        
-            var _i = 0;
-            var _p = 0;
-            repeat(array_length(_vcount_list))
+            if (_controller != undefined)
             {
-                array_push(_vstring_lookup_list, _p);
-                _p += 2*_vcount_list[_i];
-            }
+                var _vertex_weights = _controller[eDotDaeController.VertexWeights];
+                _joint_vertex_count = _vertex_weights[eDotDaeVertexWeights.Count];
         
-            //Find the joint weight values
-            var _input_array = _vertex_weights[eDotDaeVertexWeights.InputArray];
-            var _i = 0;
-            repeat(array_length(_input_array))
-            {
-                var _input = _input_array[_i];
-                var _source_name = _input[eDotDaeInput.Source  ];
-                var _semantic    = _input[eDotDaeInput.Semantic];
-            
-                if (_semantic == "WEIGHT")
+                _v_list      = __dotdae_string_decompose_list(_vertex_weights[eDotDaeVertexWeights.VString     ], true);
+                _vcount_list = __dotdae_string_decompose_list(_vertex_weights[eDotDaeVertexWeights.VCountString], true);
+        
+                var _i = 0;
+                var _p = 0;
+                repeat(array_length(_vcount_list))
                 {
-                    if (string_char_at(_source_name, 1) == "#") _source_name = string_delete(_source_name, 1, 1);
-                    var _source = _dae_object_map[$ _source_name];
-                    var _source_array = _source[eDotDaeSource.FloatArray];
-                    _weight_source = _source_array[eDotDaeFloatArray.List];
+                    array_push(_vstring_lookup_list, _p);
+                    _p += 2*_vcount_list[_i];
                 }
+        
+                //Find the joint weight values
+                var _input_array = _vertex_weights[eDotDaeVertexWeights.InputArray];
+                var _i = 0;
+                repeat(array_length(_input_array))
+                {
+                    var _input = _input_array[_i];
+                    var _source_name = _input[eDotDaeInput.Source  ];
+                    var _semantic    = _input[eDotDaeInput.Semantic];
             
-                ++_i;
+                    if (_semantic == "WEIGHT")
+                    {
+                        if (string_char_at(_source_name, 1) == "#") _source_name = string_delete(_source_name, 1, 1);
+                        var _source = _dae_object_map[$ _source_name];
+                        var _source_array = _source[eDotDaeSource.FloatArray];
+                        _weight_source = _source_array[eDotDaeFloatArray.List];
+                    }
+            
+                    ++_i;
+                }
             }
         }
     
@@ -372,27 +374,27 @@ function dotdae_model_load(_buffer)
                 repeat(_vertex_count)
                 {
                     //Write the position
-                    var _j = 3*_position_index_list[| _i];
-                    vertex_position_3d(_vbuff, _position_source[| _j], _position_source[| _j+1], _position_source[| _j+2]);
+                    var _j = 3*_position_index_list[_i];
+                    vertex_position_3d(_vbuff, _position_source[_j], _position_source[_j+1], _position_source[_j+2]);
                 
                     //Write the normal
-                    var _j = 3*_normal_index_list[| _i];
-                    vertex_normal(_vbuff, _normal_source[| _j], _normal_source[| _j+1], _normal_source[| _j+2]);
+                    var _j = 3*_normal_index_list[_i];
+                    vertex_normal(_vbuff, _normal_source[_j], _normal_source[_j+1], _normal_source[_j+2]);
                 
                     //Write the colour
-                    var _j = 3*_colour_index_list[| _i];
-                    var _colour = make_colour_rgb(255*_colour_source[| _j], 255*_colour_source[| _j+1], 255*_colour_source[| _j+2]);
+                    var _j = 3*_colour_index_list[_i];
+                    var _colour = make_colour_rgb(255*_colour_source[_j], 255*_colour_source[_j+1], 255*_colour_source[_j+2]);
                     vertex_color(_vbuff, _colour, 1.0);
                 
                     //Write the UV
-                    var _j = 2*_texcoord_index_list[| _i];
+                    var _j = 2*_texcoord_index_list[_i];
                     if (_flip_texcoords) //TODO - Move this if-check outside the loop?
                     {
-                        vertex_texcoord(_vbuff, _texcoord_source[| _j], 1.0 - _texcoord_source[| _j+1]);
+                        vertex_texcoord(_vbuff, _texcoord_source[_j], 1.0 - _texcoord_source[_j+1]);
                     }
                     else
                     {
-                        vertex_texcoord(_vbuff, _texcoord_source[| _j], _texcoord_source[| _j+1]);
+                        vertex_texcoord(_vbuff, _texcoord_source[_j], _texcoord_source[_j+1]);
                     }
                 
                     //Iterate!
@@ -423,26 +425,26 @@ function dotdae_model_load(_buffer)
                 repeat(_vertex_count)
                 {
                     //Write the position
-                    var _j = 3*_position_index_list[| _i];
-                    vertex_position_3d(_vbuff, _position_source[| _j], _position_source[| _j+1], _position_source[| _j+2]);
+                    var _j = 3*_position_index_list[_i];
+                    vertex_position_3d(_vbuff, _position_source[_j], _position_source[_j+1], _position_source[_j+2]);
                 
                     //Write a default null normal
                     vertex_normal(_vbuff, 0, 0, 0);
                 
                     //Write the colour
-                    var _j = 3*_colour_index_list[| _i];
-                    var _colour = make_colour_rgb(255*_colour_source[| _j], 255*_colour_source[| _j+1], 255*_colour_source[| _j+2]);
+                    var _j = 3*_colour_index_list[_i];
+                    var _colour = make_colour_rgb(255*_colour_source[_j], 255*_colour_source[_j+1], 255*_colour_source[_j+2]);
                     vertex_color(_vbuff, _colour, 1.0);
                 
                     //Write the UV
-                    var _j = 2*_texcoord_index_list[| _i];
+                    var _j = 2*_texcoord_index_list[_i];
                     if (_flip_texcoords) //TODO - Move this if-check outside the loop?
                     {
-                        vertex_texcoord(_vbuff, _texcoord_source[| _j], 1.0 - _texcoord_source[| _j+1]);
+                        vertex_texcoord(_vbuff, _texcoord_source[_j], 1.0 - _texcoord_source[_j+1]);
                     }
                     else
                     {
-                        vertex_texcoord(_vbuff, _texcoord_source[| _j], _texcoord_source[| _j+1]);
+                        vertex_texcoord(_vbuff, _texcoord_source[_j], _texcoord_source[_j+1]);
                     }
                 
                     //Iterate!
@@ -473,25 +475,25 @@ function dotdae_model_load(_buffer)
                 repeat(_vertex_count)
                 {
                     //Write the position
-                    var _j = 3*_position_index_list[| _i];
-                    vertex_position_3d(_vbuff, _position_source[| _j], _position_source[| _j+1], _position_source[| _j+2]);
+                    var _j = 3*_position_index_list[_i];
+                    vertex_position_3d(_vbuff, _position_source[_j], _position_source[_j+1], _position_source[_j+2]);
                 
                     //Write the normal
-                    var _j = 3*_normal_index_list[| _i];
-                    vertex_normal(_vbuff, _normal_source[| _j], _normal_source[| _j+1], _normal_source[| _j+2]);
+                    var _j = 3*_normal_index_list[_i];
+                    vertex_normal(_vbuff, _normal_source[_j], _normal_source[_j+1], _normal_source[_j+2]);
                 
                     //Write a default colour
                     vertex_color(_vbuff, DOTDAE_DEFAULT_DIFFUSE_RGB, 1.0);
                 
                     //Write the UV
-                    var _j = 2*_texcoord_index_list[| _i];
+                    var _j = 2*_texcoord_index_list[_i];
                     if (_flip_texcoords) //TODO - Move this if-check outside the loop?
                     {
-                        vertex_texcoord(_vbuff, _texcoord_source[| _j], 1.0 - _texcoord_source[| _j+1]);
+                        vertex_texcoord(_vbuff, _texcoord_source[_j], 1.0 - _texcoord_source[_j+1]);
                     }
                     else
                     {
-                        vertex_texcoord(_vbuff, _texcoord_source[| _j], _texcoord_source[| _j+1]);
+                        vertex_texcoord(_vbuff, _texcoord_source[_j], _texcoord_source[_j+1]);
                     }
                 
                     //Iterate!
@@ -524,11 +526,11 @@ function dotdae_model_load(_buffer)
                 repeat(_vertex_count)
                 {
                     //Write the position
-                    var _j = _position_index_list[| _i];
+                    var _j = _position_index_list[_i];
                     if (_j != undefined)
                     {
                         _j *= 3;
-                        vertex_position_3d(_vbuff, _position_source[| _j], _position_source[| _j+1], _position_source[| _j+2]);
+                        vertex_position_3d(_vbuff, _position_source[_j], _position_source[_j+1], _position_source[_j+2]);
                     }
                     else
                     {
@@ -536,11 +538,11 @@ function dotdae_model_load(_buffer)
                     }
                 
                     //Write the normal
-                    var _j = _normal_index_list[| _i];
+                    var _j = _normal_index_list[_i];
                     if (_j != undefined)
                     {
                         _j *= 3;
-                        vertex_normal(_vbuff, _normal_source[| _j], _normal_source[| _j+1], _normal_source[| _j+2]);
+                        vertex_normal(_vbuff, _normal_source[_j], _normal_source[_j+1], _normal_source[_j+2]);
                     }
                     else
                     {
@@ -548,11 +550,11 @@ function dotdae_model_load(_buffer)
                     }
                 
                     //Write the colour
-                    var _j = _colour_index_list[| _i];
+                    var _j = _colour_index_list[_i];
                     if (_j != undefined)
                     {
                         _j *= 3;
-                        var _colour = make_colour_rgb(255*_colour_source[| _j], 255*_colour_source[| _j+1], 255*_colour_source[| _j+2]);
+                        var _colour = make_colour_rgb(255*_colour_source[_j], 255*_colour_source[_j+1], 255*_colour_source[_j+2]);
                         vertex_color(_vbuff, _colour, 1.0);
                     }
                     else
@@ -561,17 +563,17 @@ function dotdae_model_load(_buffer)
                     }
                 
                     //Write the UV
-                    var _j = _texcoord_index_list[| _i];
+                    var _j = _texcoord_index_list[_i];
                     if (_j != undefined)
                     {
                         _j *= 2;
                         if (_flip_texcoords)
                         {
-                            vertex_texcoord(_vbuff, _texcoord_source[| _j], 1.0 - _texcoord_source[| _j+1]);
+                            vertex_texcoord(_vbuff, _texcoord_source[_j], 1.0 - _texcoord_source[_j+1]);
                         }
                         else
                         {
-                            vertex_texcoord(_vbuff, _texcoord_source[| _j], _texcoord_source[| _j+1]);
+                            vertex_texcoord(_vbuff, _texcoord_source[_j], _texcoord_source[_j+1]);
                         }
                     }
                     else

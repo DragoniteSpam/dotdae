@@ -397,7 +397,7 @@ function __dotdae_model_load_inner(_map, _context) {
     if (_stack_size != array_length(global.__dae_stack))
     {
         array_delete(global.__dae_stack, array_length(global.__dae_stack)-1, 1);
-        global.__dae_object_on_stack = global.__dae_stack[array_length(global.__dae_stack)-1];
+        global.__dae_object_on_stack = (array_length(global.__dae_stack) > 0) ? global.__dae_stack[array_length(global.__dae_stack)-1] : undefined;
     }
 
     return _return;
